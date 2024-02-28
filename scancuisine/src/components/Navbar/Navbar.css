@@ -1,0 +1,40 @@
+.navbar {
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(243, 229, 245, 0.8);
+  z-index: 1000;
+  transition: top 0.3s; /* animație pentru tranziția de înălțime (apare/dispare) */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* adăugare umbre */
+}
+
+.navbar.hidden {
+  top: -100px; /* ascunde bara de navigare deasupra ecranului */
+}
+
+/* Stil pentru link-uri */
+.navbar .ant-menu-item a {
+  color: #8e24aa; /* culoare mov pentru link-uri */
+}
+
+/* Stil pentru input */
+.navbar .ant-input {
+  background-color: #fce4ec; /* culoare roz deschis pentru input */
+}
+
+/* Stil pentru buton */
+.navbar .ant-btn-primary {
+  background-color: #8e24aa; /* culoare mov pentru buton */
+  border-color: #8e24aa; /* culoare bordură pentru buton */
+}
+
+/* Stil pentru iconițe */
+.navbar .anticon svg {
+  fill: #8e24aa; /* culoare mov pentru iconițe */
+}
+
+.navbar .myprofile {
+  margin-left: auto;
+}

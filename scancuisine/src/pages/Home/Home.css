@@ -1,0 +1,38 @@
+.home {
+  align-items: center;
+  justify-content: center;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  background-color: #f4dcf6;
+}
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipes-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: auto;
+  margin-top: 20px;
+  /*pentru mai multe retete pe linie*/
+
+  /* margin-left: 80px;
+  margin-right: 80px;
+  flex-wrap: wrap;*/
+}
+
+.popular-recipes {
+  margin-top: 20px;
+  color: #590865;
+}
+
+.latest-recipes {
+  color: #590865;
+}
