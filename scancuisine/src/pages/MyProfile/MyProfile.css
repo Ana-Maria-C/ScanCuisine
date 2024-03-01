@@ -1,37 +1,53 @@
-.myprofile {
+.profilepage {
+  display: flex;
+  flex-direction: column;
   max-width: 95%;
   margin: 0 auto;
 }
 
 .profiledetails {
   display: flex;
+  flex-direction: row;
   align-items: center;
-  margin-top: 20px;
-  margin-bottom: 20px;
+  justify-content: space-between;
   padding: 20px;
   border: 1px solid #e0e0e0;
   border-radius: 10px;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 10px 0 rgba(68, 9, 91, 0.1);
   background-color: #fff;
+  flex: 1;
 }
 
-.photo {
-  width: 100px;
-  height: 100px;
-  margin-right: 20px;
-}
-
+.description,
 .form {
-  flex: 1; /* Faceți ca formularul să ocupe spațiul disponibil */
+  background-color: #f0e6f4; /* Mov deschis */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  max-width: 30%;
+  margin: 0 10px;
+  flex: 1;
+}
+
+.profileimage {
+  width: 200px;
+  height: 200px;
+  padding-left: 50px;
+}
+
+.description-group {
+  margin-bottom: 10px;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 label {
   display: block;
   margin-bottom: 5px;
+  font-weight: bold;
 }
 
 input {
@@ -46,11 +62,50 @@ button {
   padding: 8px 16px;
   background-color: #8e24aa;
   color: #fff;
+  padding: 10px 20px;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 button:hover {
   background-color: #6a1b9a;
+}
+
+button:focus {
+  outline: none;
+}
+
+h1 {
+  color: #590865; /* Mov închis */
+}
+
+.myrecipes,
+.myfavorites,
+.following {
+  display: flex;
+  flex-direction: column;
+  color: #590865;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(68, 9, 91, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.myrecipes-container,
+.following-container {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  /*pentru mai multe retete pe linie*/
+
+  /* margin-left: 80px;
+  margin-right: 80px;
+  flex-wrap: wrap;*/
 }
