@@ -27,14 +27,12 @@ export default function Login() {
       <div className="login-container">
         <div className="login-form">
           <h2>Login</h2>
-          <form>
-            <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" />
-            <label htmlFor="password">Password</label>
+          <form className="login-form-fields">
+            <input type="email" placeholder="Email" name="email" />
             <div className="password-input-container">
               <input
                 type={showPassword ? "text" : "password"}
-                id="password"
+                placeholder="Password"
                 name="password"
               />
               <span

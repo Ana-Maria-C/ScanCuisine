@@ -11,6 +11,7 @@ import Register from "../pages/Register/Register";
 import About from "../pages/About/About";
 import Navbar from "../components/Navbar/Navbar";
 import MyProfile from "../pages/MyProfile/MyProfile";
+import Recipe from "../pages/Recipe/Recipe";
 
 export const router = (
   <Router>
@@ -22,6 +23,7 @@ export const router = (
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Home />} />
       <Route path="/about" element={<About />} />
+      <Route path="/recipe" element={<Recipe />} />
     </Routes>
   </Router>
 );

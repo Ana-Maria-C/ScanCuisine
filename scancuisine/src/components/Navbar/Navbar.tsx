@@ -1,32 +1,27 @@
 import React, { useState, useEffect } from "react";
 import { Menu, Button, Input } from "antd";
 import { Link } from "react-router-dom";
-import { UserOutlined, SearchOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  SearchOutlined,
+  CameraOutlined,
+} from "@ant-design/icons";
 import "./Navbar.css";
 
 function Navbar() {
-  const [prevScrollPos, setPrevScrollPos] = useState(0);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollPos = window.scrollY;
-      setVisible(
-        (prevScrollPos > currentScrollPos &&
-          prevScrollPos - currentScrollPos > 70) ||
-          currentScrollPos < 10
-      );
-      setPrevScrollPos(currentScrollPos);
+    const handleMouseMove = (event: MouseEvent) => {
+      const yPos = event.clientY;
+      setVisible(yPos < 30);
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [prevScrollPos, visible]);
 
-  useEffect(() => {
-    // Ascunde bara de navigare la încărcarea paginii
-    setVisible(false);
+    document.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+    };
   }, []);
   return (
     <Menu mode="horizontal" className={`navbar ${visible ? "" : "hidden"}`}>
@@ -39,6 +34,9 @@ function Navbar() {
           placeholder="Find a recipe"
           // Adaugă orice alte proprietăți sau stiluri aici
         />
+      </Menu.Item>
+      <Menu.Item key="scan" className="camera-scan">
+        <CameraOutlined />
       </Menu.Item>
       <Menu.Item key="profile" className="myprofile">
         <Link to="/myprofile">

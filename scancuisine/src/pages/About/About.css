@@ -1,0 +1,65 @@
+.motivation-title,
+.purpose-title,
+.community-title,
+.rules-title,
+.team-title {
+  display: flex;
+  align-items: start;
+  font-size: 1.8rem;
+  color: #e489ec;
+  font-style: oblique;
+}
+
+.about-us-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-bottom: 40px;
+}
+
+.motivation p,
+.purpose p,
+.community p,
+.team-info {
+  font-size: 1.2rem;
+  color: #590865;
+}
+
+.rules ul {
+  display: flex;
+  flex-direction: column;
+  font-size: 1.2rem;
+  color: #590865;
+  align-items: start;
+}
+
+.team-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.team-image {
+  width: 500px;
+  border-radius: 50%;
+  max-width: 50%;
+}
+
+.team-description {
+  display: flex;
+  flex-direction: column;
+  width: 40%;
+  margin-left: 100px;
+}
+
+.team-name {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #590865;
+}
+
+.team-position {
+  font-size: 1.4rem;
+  color: #590865;
+}

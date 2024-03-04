@@ -1,0 +1,126 @@
+.recipe {
+  display: flex;
+  flex-direction: column;
+}
+
+.recipe-title {
+  font-size: 2rem;
+  margin: 1rem 0;
+  margin-bottom: 40px;
+}
+
+.recipe-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 50px;
+}
+
+.recipe-container li {
+  margin-bottom: 10px;
+  font-size: 18px;
+  color: #590865;
+}
+
+.sub-title {
+  font-size: 2rem;
+  color: #e489ec;
+  font-style: oblique;
+  margin-bottom: 50px;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-image {
+  display: flex;
+  width: 50%;
+  max-width: 50%;
+  height: auto;
+  margin-left: 20%;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+.recipe-ingredients {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.recipe-ingredients-container {
+  align-items: start;
+  justify-content: start;
+}
+
+.recipe-instructions {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 50px;
+}
+
+.recipe-preparation {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+}
+
+.recipe-video {
+  display: flex;
+  flex-direction: column;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-preparation p {
+  display: flex;
+  font-size: 18px;
+  color: #590865;
+  margin-left: 5%;
+  text-align-last: start;
+}
+
+.video-container {
+  display: flex;
+  width: 80%;
+  height: auto;
+  border-radius: 10px;
+}
+
+.comments-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px 0 rgba(68, 9, 91, 0.1);
+  border-radius: 10px;
+  width: 95%;
+  margin-left: 2.5%;
+}
+
+.user-comment-detail {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+}
+
+.user-comment {
+  display: flex;
+  width: 80%;
+  align-items: center;
+}
+.user-image {
+  width: 100px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.like-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: end;
+  justify-content: end;
+  gap: 5px;
+}

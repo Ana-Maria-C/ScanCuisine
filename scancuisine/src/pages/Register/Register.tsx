@@ -23,18 +23,14 @@ export default function Register() {
       <div className="login-container">
         <div className="login-form">
           <h2>Register</h2>
-          <form>
-            <label htmlFor="FirstName">First Name</label>
-            <input type="text" id="FirstName" name="FirstName" />
-            <label htmlFor="LastName">Last Name</label>
-            <input type="text" id="LastName" name="LastName" />
-            <label htmlFor="email">Email</label>
-            <input type="email" id="email" name="email" />
-            <label htmlFor="password">Password</label>
+          <form className="login-form-fields">
+            <input type="text" placeholder="FirstName" name="FirstName" />
+            <input type="text" placeholder="LastName" name="LastName" />
+            <input type="email" placeholder="Email" name="email" />
             <div className="password-input-container">
               <input
                 type={showPassword ? "text" : "password"}
-                id="password"
+                placeholder="Password"
                 name="password"
               />
               <span

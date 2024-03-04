@@ -37,25 +37,25 @@
 .login-form {
   width: 100%;
   max-width: 50%;
-  border: 2px solid #d6aded;
+  border: 2px solid #c68ee7;
   border-radius: 10px;
+  box-shadow: 0 0 20px 5px rgba(68, 9, 91, 0.1);
 }
 
 .login-form h2 {
-  margin-bottom: 20px;
   color: #590865;
+  font-size: 2rem;
 }
 
 .login-form label {
   font-weight: bold;
   color: #9a2adf;
-  margin-bottom: 10px;
 }
 
 .login-form input {
   width: 100%;
   padding: 10px;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
   border: 1px solid #d6aded;
   border-radius: 4px;
   font-size: 16px;
@@ -72,6 +72,7 @@
   cursor: pointer;
   font-size: 18px;
   box-sizing: border-box;
+  margin-bottom: 10px;
 }
 
 .login-form button:hover {
@@ -94,4 +95,8 @@
   font-size: 18px;
   color: #590865;
   text-decoration: none;
+}
+
+.login-form-fields {
+  padding: 20px;
 }

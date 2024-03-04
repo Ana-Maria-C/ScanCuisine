@@ -36,3 +36,26 @@
 .latest-recipes {
   color: #590865;
 }
+
+.footer {
+  margin-top: 40px;
+  background-color: #f4dcf6;
+  color: #590865;
+  padding: 40px 0;
+  text-align: center;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+p {
+  margin: 0;
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+.footer-title {
+  font-size: 18px;
+}

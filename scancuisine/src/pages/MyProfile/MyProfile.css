@@ -18,18 +18,6 @@
   flex: 1;
 }
 
-.description,
-.form {
-  background-color: #f0e6f4; /* Mov deschis */
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 30%;
-  max-width: 30%;
-  margin: 0 10px;
-  flex: 1;
-}
-
 .profileimage {
   width: 200px;
   height: 200px;
@@ -48,6 +36,8 @@ label {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
+  font-size: 1.1rem;
+  color: #590865;
 }
 
 input {
@@ -59,7 +49,6 @@ input {
 }
 
 button {
-  padding: 8px 16px;
   background-color: #8e24aa;
   color: #fff;
   padding: 10px 20px;
@@ -67,6 +56,13 @@ button {
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s;
+}
+
+.description-button,
+.form-button {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
 }
 
 button:hover {
@@ -79,6 +75,8 @@ button:focus {
 
 h1 {
   color: #590865; /* Mov închis */
+  background-color: #f4dcf6;
+  border-radius: 10px;
 }
 
 .myrecipes,
@@ -108,4 +106,36 @@ h1 {
   /* margin-left: 80px;
   margin-right: 80px;
   flex-wrap: wrap;*/
+}
+
+.description-field,
+.form-field {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  background-color: #f0e6f4; /* Mov deschis */
+  padding: 20px;
+  margin: 0 10px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 30%;
+  max-width: 30%;
+  height: 250px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.description-text.editing {
+  border-color: #8e24aa;
+  box-shadow: 0 0 5px rgba(68, 9, 91, 0.3);
+}
+
+.form-text.editing {
+  border-color: #8e24aa;
+  box-shadow: 0 0 5px rgba(68, 9, 91, 0.3);
 }
