@@ -63,3 +63,52 @@
   font-size: 1.4rem;
   color: #590865;
 }
+
+@media screen and (max-width: 768px) {
+  .about-us-container {
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+
+  .team-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .team-image {
+    width: 300px;
+    max-width: 100%;
+  }
+
+  .team-description {
+    width: 80%;
+    margin-top: 20px;
+    margin-left: 0;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .motivation-title,
+  .purpose-title,
+  .community-title,
+  .rules-title,
+  .team-title {
+    font-size: 1.5rem;
+  }
+
+  .motivation p,
+  .purpose p,
+  .community p,
+  .team-info {
+    font-size: 1rem;
+  }
+
+  .team-name {
+    font-size: 1.2rem;
+  }
+
+  .team-position {
+    font-size: 1rem;
+  }
+}

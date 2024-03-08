@@ -91,6 +91,7 @@ h1 {
   background-color: #fff;
   padding: 20px;
   margin-top: 20px;
+  flex: 1;
 }
 
 .myrecipes-container,
@@ -138,4 +139,102 @@ h1 {
 .form-text.editing {
   border-color: #8e24aa;
   box-shadow: 0 0 5px rgba(68, 9, 91, 0.3);
+}
+
+@media screen and (max-width: 1024px) {
+  .profileimage {
+    padding: 20px;
+  }
+
+  .myrecipes-container,
+  .following-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+
+  .description-field,
+  .form-field {
+    height: 280px;
+  }
+
+  .form {
+    margin-top: 20px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .profileimage {
+    width: 230px;
+    padding: 20px;
+  }
+
+  .myrecipes-container,
+  .following-container {
+    flex-wrap: wrap;
+  }
+
+  .profiledetails {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+  }
+
+  .description,
+  .form {
+    width: 300px;
+  }
+
+  .description-field,
+  .form-field {
+    height: 250px;
+    width: 300px;
+    max-width: 300px;
+  }
+
+  .form {
+    margin-top: 20px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 1.6rem;
+  }
+
+  .profileimage {
+    width: 150px;
+    height: 150px;
+  }
+
+  .description-field,
+  .form-field {
+    height: 300px;
+    width: 240px;
+    max-width: 240px;
+  }
+
+  .description,
+  .form {
+    height: 300px;
+    width: 250px;
+    max-width: 250px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .form {
+    margin-top: 0;
+  }
+
+  .myrecipes-container,
+  .myfavorites-container,
+  .following-container {
+    gap: 30px;
+  }
+
+  h2 {
+    margin-bottom: 40px;
+  }
 }

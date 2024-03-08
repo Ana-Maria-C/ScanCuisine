@@ -59,3 +59,29 @@ p {
 .footer-title {
   font-size: 18px;
 }
+
+@media screen and (max-width: 1024px) {
+  .recipes-container {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .recipes-container {
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .footer-title {
+    font-size: 16px;
+  }
+}

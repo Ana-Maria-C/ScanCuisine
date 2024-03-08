@@ -1,5 +1,5 @@
 /* login.css */
-.login {
+.register {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -7,25 +7,7 @@
   background-color: #f4dcf6;
 }
 
-.slideShow {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  overflow: hidden; /* Pentru a asigura că imaginile nu ies în afara containerului */
-}
-
-.slideShowContainer {
-  width: 100%;
-  height: 100vh;
-}
-
-.slideShowImage {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.login-container {
+.register-container {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -33,7 +15,7 @@
   align-items: center;
 }
 
-.login-form {
+.register-form {
   width: 100%;
   max-width: 50%;
   border: 2px solid #c68ee7;
@@ -41,17 +23,17 @@
   box-shadow: 0 0 20px 5px rgba(68, 9, 91, 0.1);
 }
 
-.login-form h2 {
+.register-form h2 {
   color: #590865;
   font-size: 2rem;
 }
 
-.login-form label {
+.register-form label {
   font-weight: bold;
   color: #9a2adf;
 }
 
-.login-form input {
+.register-form input {
   width: 100%;
   padding: 10px;
   margin-bottom: 20px;
@@ -61,7 +43,7 @@
   box-sizing: border-box;
 }
 
-.login-form button {
+.register-form button {
   width: 100%;
   padding: 10px;
   background-color: #9a2adf;
@@ -74,7 +56,7 @@
   margin-bottom: 10px;
 }
 
-.login-form button:hover {
+.register-form button:hover {
   background-color: #590865;
 }
 
@@ -96,48 +78,57 @@
   text-decoration: none;
 }
 
-.login-form-fields {
-  padding: 20px;
-}
-
 @media screen and (max-width: 1024px) {
-  .login-form {
+  .register-form {
     max-width: 70%;
   }
 }
 
 @media screen and (max-width: 768px) {
-  .login-form {
+  .register-form {
     max-width: 80%;
   }
 }
 
 @media screen and (max-width: 480px) {
-  .login-form {
+  .register-form {
     max-width: 100%;
-    width: 90%;
   }
 
-  .login-container {
+  .register-container {
     margin-bottom: 40px;
-    width: 100%;
-    max-width: 100%;
+    padding: 20px;
+    margin-bottom: 10px;
   }
-  .login {
+  .register {
     flex-direction: column;
     height: 100vh;
   }
 
-  .login-form h2 {
+  .register-form h2 {
     color: #590865;
     font-size: 1.6rem;
     margin-bottom: 0px;
   }
+
   .slideShowImage {
     display: none;
   }
-
   .slideShow {
     display: none;
   }
+  /*
+  .slideShowImage {
+    height: 50%;
+    width: 100%;
+  }
+
+  .slideShow {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+    width: 100%;
+  }
+  */
 }

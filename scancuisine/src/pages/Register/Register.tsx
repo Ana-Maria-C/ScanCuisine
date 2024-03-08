@@ -1,6 +1,6 @@
 // login.tsx
 import SlideShow from "../../components/SlideShow";
-import "../Login/Login.css";
+import "./Register.css";
 import { useState } from "react";
 
 export default function Register() {
@@ -19,9 +19,9 @@ export default function Register() {
   };
 
   return (
-    <div className="login">
-      <div className="login-container">
-        <div className="login-form">
+    <div className="register">
+      <div className="register-container">
+        <div className="register-form">
           <h2>Register</h2>
           <form className="login-form-fields">
             <input type="text" placeholder="FirstName" name="FirstName" />
