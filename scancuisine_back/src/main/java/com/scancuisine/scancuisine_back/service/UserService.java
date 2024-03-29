@@ -4,7 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.api.core.ApiFutures;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
-import com.scancuisine.scancuisine_back.entity.User;
+import com.scancuisine.scancuisine_back.entity.user.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -171,4 +171,6 @@ public class UserService {
             return null;
         }
     }
+
+
 }

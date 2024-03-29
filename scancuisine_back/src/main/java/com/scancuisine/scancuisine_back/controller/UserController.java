@@ -1,6 +1,6 @@
 package com.scancuisine.scancuisine_back.controller;
 
-import com.scancuisine.scancuisine_back.entity.User;
+import com.scancuisine.scancuisine_back.entity.user.User;
 import com.scancuisine.scancuisine_back.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

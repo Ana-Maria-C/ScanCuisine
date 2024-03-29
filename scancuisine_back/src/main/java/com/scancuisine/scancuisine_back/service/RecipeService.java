@@ -4,7 +4,7 @@ import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
 import com.google.firebase.cloud.FirestoreClient;
 import com.scancuisine.scancuisine_back.entity.Recipe;
-import com.scancuisine.scancuisine_back.entity.User;
+import com.scancuisine.scancuisine_back.entity.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
