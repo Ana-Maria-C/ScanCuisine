@@ -1,17 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./MyProfile.css";
 import CustomCard from "../../components/CustomCard/CustomCard";
 import UserCard from "../../components/UserCard/UserCard";
+import axios from "axios";
+import AddCard from "../../components/CustomCard/AddCard";
 
 function MyProfile() {
-  const [name, setName] = useState("Constantin");
-  const [surname, setSurname] = useState("Ana");
-  const [email, setEmail] = useState("constantinana343@yahoo.com");
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [email, setEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
-  const [description, setDescription] = useState(
-    "I radiate a unique passion for the culinary arts, turning every moment in the kitchen into a journey filled with unmistakable flavors and aromas. I start my day with a smile drawn by the fresh aroma of coffee, and in every recipe.For me, cooking is not just an activity - it's a form of expression and connection with souls."
-  );
+  const [description, setDescription] = useState("");
   const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const myToken = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:8090/api/users/token/${myToken}`
+        );
+        const {
+          lastName,
+          firstName,
+          email,
+          description,
+          imageUrl,
+          myRecipes,
+          myFavoriteRecipes,
+          followedPeople,
+        } = response.data;
+        setName(lastName);
+        setSurname(firstName);
+        setEmail(email);
+        setDescription(description);
+      } catch (error) {
+        console.error("Error fetching profile:", (error as Error).message);
+      }
+    }
+
+    fetchProfile();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -21,14 +50,28 @@ function MyProfile() {
     setIsDescriptionEditing(true);
   };
 
-  const handleDescriptionSave = () => {
-    setIsDescriptionEditing(false);
-    // implementare backend
+  const handleDescriptionSave = async () => {
+    try {
+      await axios.put(`http://localhost:8090/api/users/${email}`, {
+        description: description,
+      });
+      setIsDescriptionEditing(false);
+    } catch (error) {
+      console.error("Error saving description:", (error as Error).message);
+    }
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    // implementare backend
+  const handleSave = async () => {
+    try {
+      await axios.put(`http://localhost:8090/api/users/${email}`, {
+        lastName: name,
+        firstName: surname,
+        email: email,
+      });
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Error saving profile:", (error as Error).message);
+    }
   };
 
   return (
@@ -57,7 +100,11 @@ function MyProfile() {
                       onChange={(e) => setDescription(e.target.value)}
                     />
                   ) : (
-                    <div>{description}</div>
+                    <div className="description-text">
+                      {description
+                        ? description
+                        : "There is no description yet."}
+                    </div>
                   )}
                 </div>
               </div>
@@ -127,11 +174,11 @@ function MyProfile() {
         <div className="myrecipes">
           <h2>My Recipes</h2>
           <div className="myrecipes-container">
-            <CustomCard imageUrl="./mancare1.jpg" title="Soup" />
             <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
             <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
             <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
             <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />
+            <AddCard imageUrl="./add.jpg" title="Add a recipe" />
           </div>
         </div>
         <div className="myfavorites">

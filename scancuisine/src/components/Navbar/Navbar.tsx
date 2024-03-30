@@ -7,9 +7,12 @@ import {
   CameraOutlined,
 } from "@ant-design/icons";
 import "./Navbar.css";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
   const [visible, setVisible] = useState(false);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -23,6 +26,13 @@ function Navbar() {
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    console.log("Logout successful");
+    navigate("/login");
+  };
+
   return (
     <Menu mode="horizontal" className={`navbar ${visible ? "" : "hidden"}`}>
       <Menu.Item key="home">
@@ -37,6 +47,9 @@ function Navbar() {
       </Menu.Item>
       <Menu.Item key="scan" className="camera-scan">
         <CameraOutlined />
+      </Menu.Item>
+      <Menu.Item key="logout" className="logout" onClick={handleLogout}>
+        <Link to="">Log Out</Link>
       </Menu.Item>
       <Menu.Item key="profile" className="myprofile">
         <Link to="/myprofile">

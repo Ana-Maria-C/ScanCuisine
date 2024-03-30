@@ -38,3 +38,7 @@
 .navbar .myprofile {
   margin-left: auto;
 }
+
+.navbar .logout {
+  margin-left: 60%;
+}

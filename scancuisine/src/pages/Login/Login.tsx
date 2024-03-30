@@ -3,6 +3,8 @@ import SlideShow from "../../components/SlideShow";
 import "./Login.css";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { Navigate } from "react-router-dom";
 
 export default function Login() {
   const images = [
@@ -15,9 +17,38 @@ export default function Login() {
   ];
 
   const [showPassword, setShowPassword] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginSuccess, setloginSuccess] = useState(false);
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    try {
+      const response = await axios.post(
+        "http://localhost:8090/api/auth/authenticate",
+        {
+          email,
+          password,
+        }
+      );
+
+      console.log("Login successful, token: ", response.data);
+      localStorage.setItem("token", response.data["token"]);
+      setloginSuccess(true);
+    } catch (error) {
+      console.error("Login failed:", (error as Error).message);
+      // Handle login failure, such as displaying an error message to the user
+    }
+  };
+
+  if (loginSuccess) {
+    return <Navigate to="/home" />;
+  }
 
   return (
     <div className="login">
@@ -27,13 +58,21 @@ export default function Login() {
       <div className="login-container">
         <div className="login-form">
           <h2>Login</h2>
-          <form className="login-form-fields">
-            <input type="email" placeholder="Email" name="email" />
+          <form className="login-form-fields" onSubmit={handleSubmit}>
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
             <div className="password-input-container">
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 name="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               <span
                 onClick={togglePasswordVisibility}

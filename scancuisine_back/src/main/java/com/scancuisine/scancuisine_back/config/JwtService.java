@@ -30,13 +30,14 @@ public class JwtService {
         return generateToken(new HashMap<>(), userDetails);
     }
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
+        String compact = Jwts.builder()
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24 * 60))
                 .signWith(getSignIngKey(), SignatureAlgorithm.HS256)
                 .compact();
+        return compact;
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

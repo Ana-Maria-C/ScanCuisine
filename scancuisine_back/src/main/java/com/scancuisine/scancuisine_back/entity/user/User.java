@@ -26,14 +26,10 @@ public class User implements UserDetails {
     private List<String> myFavoriteRecipes = new ArrayList<>();
     private List<String> followedPeople = new ArrayList<>();
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     public void setId() {
         this.id = UUID.randomUUID().toString();
-    }
-    public void setPassword(String password) {
-        // Hash the password
-        this.password = BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     public boolean checkPassword(String candidatePassword) {
@@ -73,6 +69,24 @@ public class User implements UserDetails {
     @Override
     public String getPassword() {
         return password;
+    }
+
+    public void addRecipe(String recipe) {
+        if (recipe != null && !recipe.isEmpty()) {
+            myRecipes.add(recipe);
+        }
+    }
+
+    public void addFavoriteRecipe(String recipe) {
+        if (recipe != null && !recipe.isEmpty()) {
+            myFavoriteRecipes.add(recipe);
+        }
+    }
+
+    public void addFollowedPerson(String person) {
+        if (person != null && !person.isEmpty()) {
+            followedPeople.add(person);
+        }
     }
 
 }

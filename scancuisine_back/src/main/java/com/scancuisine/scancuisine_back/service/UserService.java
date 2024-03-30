@@ -8,7 +8,9 @@ import com.scancuisine.scancuisine_back.entity.user.User;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -26,7 +28,6 @@ public class UserService {
         if (querySnapshot.isEmpty()) {
             user.setId();
             user.setFollowedPeople(new ArrayList<>());
-            user.setPassword(user.getPassword());
             ApiFuture<WriteResult> collectionsApiFuture = usersCollection.document(user.getEmail()).set(user);
             return collectionsApiFuture.get().getUpdateTime().toString();
         } else {
@@ -77,37 +78,41 @@ public class UserService {
         try {
             DocumentSnapshot document = future.get();
             if (document.exists()) {
-                user.setId(getUserbyEmail(email).getId());
-                if (user.getFirstName().equals("string")) {
-                    user.setFirstName(getUserbyEmail(email).getFirstName());
-                }
-                if (user.getLastName().equals("string")) {
-                    user.setLastName(getUserbyEmail(email).getLastName());
-                }
-                if (user.getEmail().equals("string")) {
-                    user.setEmail(getUserbyEmail(email).getEmail());
-                }
-                if (user.getPassword().equals("string")) {
-                    user.setPassword(getUserbyEmail(email).getPassword());
-                }
-                if (user.getRole().equals("string")) {
-                    user.setRole(getUserbyEmail(email).getRole());
-                }
-                if (user.getImageUrl().equals("string")) {
-                    user.setImageUrl(getUserbyEmail(email).getImageUrl());
-                }
-                if (user.getDescription().equals("string")) {
-                    user.setDescription(getUserbyEmail(email).getDescription());
-                }
-                if(user.getMyRecipes().size()==1 && user.getMyRecipes().get(0).equals("string")){
-                    user.setMyRecipes(getUserbyEmail(email).getMyRecipes());
-                }
-                if(user.getMyFavoriteRecipes().size()==1 && user.getMyFavoriteRecipes().get(0).equals("string")){
-                    user.setMyFavoriteRecipes(getUserbyEmail(email).getMyFavoriteRecipes());
-                }
-                user.setFollowedPeople(getUserbyEmail(email).getFollowedPeople());
+                User existingUser = document.toObject(User.class);
+                Map<String, Object> updates = new HashMap<>();
 
-                ApiFuture<WriteResult> writeResultApiFuture = documentReference.set(user);
+                if (user.getFirstName() != null && !user.getFirstName().equals("string")) {
+                    updates.put("firstName", user.getFirstName());
+                }
+                if (user.getLastName() != null && !user.getLastName().equals("string")) {
+                    updates.put("lastName", user.getLastName());
+                }
+                if (user.getDescription() != null && !user.getDescription().equals("string")) {
+                    updates.put("description", user.getDescription());
+                }
+                if (user.getEmail() != null && !user.getEmail().equals("string")) {
+                    updates.put("email", user.getEmail());
+                }
+                if (user.getPassword() != null && !user.getPassword().equals("string")) {
+                    updates.put("password", user.getPassword());
+                }
+                if (user.getImageUrl() != null && !user.getImageUrl().equals("string")) {
+                    updates.put("imageUrl", user.getImageUrl());
+                }
+                if (user.getMyRecipes() != null && !user.getMyRecipes().isEmpty()) {
+                    updates.put("myRecipes", user.getMyRecipes());
+                }
+                if (user.getMyFavoriteRecipes() != null && !user.getMyFavoriteRecipes().isEmpty()) {
+                    updates.put("myFavoriteRecipes", user.getMyFavoriteRecipes());
+                }
+                if (user.getFollowedPeople() != null && !user.getFollowedPeople().isEmpty()) {
+                    updates.put("followedPeople", user.getFollowedPeople());
+                }
+                if (user.getRole() != null) {
+                    updates.put("role", user.getRole());
+                }
+
+                ApiFuture<WriteResult> writeResultApiFuture = documentReference.update(updates);
                 return writeResultApiFuture.get().getUpdateTime().toString();
             } else {
                 return "User with email " + email + " does not exist.";
@@ -171,6 +176,4 @@ public class UserService {
             return null;
         }
     }
-
-
 }

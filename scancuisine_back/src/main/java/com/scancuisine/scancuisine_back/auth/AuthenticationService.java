@@ -27,6 +27,8 @@ public class AuthenticationService {
         // Create a new instance of your application's User entity
         User user = new User();
         user.setEmail(registerRequest.getEmail());
+        user.setFirstName(registerRequest.getFirstName());
+        user.setLastName(registerRequest.getLastName());
         user.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         user.setRole(Role.USER);
 
@@ -40,7 +42,17 @@ public class AuthenticationService {
 
     public AuthenticationResponse authenticate(AuthenticationRequest authenticationRequest) {
         try {
+
+            User user = userService.getUserbyEmail(authenticationRequest.getEmail());
+            if (user == null) {
+                return AuthenticationResponse.builder().errorMessage("User not found").build();
+            }
+            if (!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
+                return AuthenticationResponse.builder().errorMessage(" Incorrect password ").build();
+            }
+
             // Authenticate the user
+
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             authenticationRequest.getEmail(),
@@ -56,8 +68,8 @@ public class AuthenticationService {
 
             return AuthenticationResponse.builder().token(jwtToken).build();
         } catch (Exception e) {
-            // Handle authentication failure
-            return null; // or throw custom exception
+            e.printStackTrace();
+            return AuthenticationResponse.builder().errorMessage("Authentication failed").build();
         }
     }
 }
