@@ -252,6 +252,7 @@ function MyProfile() {
               userRecipes.map((recipe) => (
                 <CustomCard
                   key={recipe.id}
+                  id={recipe.id}
                   imageUrl={recipe.imageUrl}
                   title={recipe.name}
                 />
@@ -274,6 +275,7 @@ function MyProfile() {
               userFavoriteRecipes.map((recipe) => (
                 <CustomCard
                   key={recipe.id}
+                  id={recipe.id}
                   imageUrl={recipe.imageUrl}
                   title={recipe.name}
                 />

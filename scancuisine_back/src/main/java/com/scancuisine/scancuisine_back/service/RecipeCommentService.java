@@ -46,6 +46,18 @@ public class RecipeCommentService {
                     return "Recipe with id "+recipeComment.getRecipeId()+" does not exist.";
                 }
                 else {
+                    if(recipeComment.getComment().equals(""))
+                    {
+                        return "Comment cannot be empty";
+                    }
+                    if(recipeComment.getLikesCount()==0)
+                    {
+                        recipeComment.setLikesCount(0);
+                    }
+                    if(recipeComment.getDislikesCount()==0)
+                    {
+                        recipeComment.setDislikesCount(0);
+                    }
                     ApiFuture<WriteResult> collectionsApiFuture = recipeCommentsCollection.document(recipeComment.getId()).set(recipeComment);
                     return collectionsApiFuture.get().getUpdateTime().toString();
                 }
@@ -141,6 +153,30 @@ public class RecipeCommentService {
                 return "Document with ID " + id + " does not exist.";
             }
         } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<RecipeComment> getRecipeCommentsByRecipeId(String recipeId) {
+        Firestore dbFirestore = FirestoreClient.getFirestore();
+        CollectionReference recipeCommentsCollection = dbFirestore.collection(COLLECTION_NAME);
+        Query query = recipeCommentsCollection.whereEqualTo("recipeId", recipeId);
+        ApiFuture<QuerySnapshot> querySnapshotApiFuture = query.get();
+        QuerySnapshot querySnapshot;
+        try {
+            querySnapshot = querySnapshotApiFuture.get();
+            List<RecipeComment> recipeCommentList = new ArrayList<>();
+            if(querySnapshot.isEmpty())
+            {
+                return new ArrayList<>();
+            }
+            for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                RecipeComment recipeComment = document.toObject(RecipeComment.class);
+                recipeCommentList.add(recipeComment);
+            }
+            return recipeCommentList;
+        } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             return null;
         }

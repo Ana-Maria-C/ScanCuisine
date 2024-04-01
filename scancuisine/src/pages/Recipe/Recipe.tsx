@@ -1,28 +1,138 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./Recipe.css";
+import { useParams } from "react-router-dom";
 import { Button } from "antd";
 import { LikeOutlined, DislikeOutlined } from "@ant-design/icons";
+import axios from "axios";
+import AddCommentModal from "../../components/AddCommentModal/AddCommentModal";
+
+interface Recipe {
+  id: string;
+  authorEmail: string;
+  name: string;
+  ingredients: string[];
+  preparationMethod: string;
+  imageUrl: string;
+  category: string;
+  cuisine: string;
+  videoUrl: string;
+  commentId: string[];
+}
+interface Comment {
+  id: string;
+  recipeId: string;
+  authorEmail: string;
+  comment: string;
+  likesCount: number;
+  dislikesCount: number;
+}
+
+interface RecipeComments {
+  authorFullName: string;
+  authorImageUrl: string;
+  comment: string;
+}
 
 function Recipe() {
+  const { id } = useParams<{ id: string }>();
+  const [recipe, setRecipe] = useState<Recipe>();
+  const [loading, setLoading] = useState(true);
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [recipeComments, setRecipeComments] = useState<RecipeComments[]>([]);
+  const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
+
+  useEffect(() => {
+    const fetchRecipe = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/recipes/${id}`
+        );
+        setRecipe(response.data);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching recipe:", error);
+        setLoading(false);
+      }
+    };
+
+    const fetchRecipeComments = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/recipe-comments/recipe/${id}`
+        );
+        const commentsData = response.data;
+        const commentsWithUserDetails = await Promise.all(
+          commentsData.map(async (comment: Comment) => {
+            try {
+              const userResponse = await axios.get(
+                `http://localhost:8090/api/users/${comment.authorEmail}`
+              );
+              console.log("User details for comment:", userResponse.data);
+
+              const fullName = `${userResponse.data.firstName} ${userResponse.data.lastName}`; // Concatenează numele și prenumele
+              return {
+                authorFullName: fullName,
+                authorImageUrl: userResponse.data.imageUrl,
+                comment: comment.comment,
+              };
+            } catch (error) {
+              console.error("Error fetching user details:", error);
+              return null;
+            }
+          })
+        );
+        const validCommentsWithUserDetails = commentsWithUserDetails.filter(
+          (comment) => comment !== null
+        );
+        setRecipeComments(validCommentsWithUserDetails);
+        console.log("Comments:", validCommentsWithUserDetails);
+      } catch (error) {
+        console.error("Error fetching recipe comments:", error);
+      }
+    };
+
+    fetchRecipe();
+    fetchRecipeComments();
+  }, [id]);
+
+  const handleAddCommentClick = () => {
+    setIsAddCommentModalOpen(true);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  if (!recipe) {
+    return <div>Recipe not found.</div>;
+  }
+
+  const handleCommentAdded = async () => {
+    try {
+      // Reîmprospătăm lista de comentarii după adăugarea unui nou comentariu
+      const response = await axios.get(
+        `http://localhost:8090/api/recipe-comments/recipe/${id}`
+      );
+      const newComment = response.data;
+      setRecipeComments((prevComments) => [...prevComments, newComment]);
+    } catch (error) {
+      console.error("Error fetching comments for this recipe:", error);
+    }
+  };
   return (
     <div className="recipe">
-      <h1 className="recipe-title">Berry Cake</h1>
+      <h1 className="recipe-title">{recipe.name}</h1>
       <div className="recipe-container">
-        <div className="image-conatiner">
-          <img src="./prajitura2.jpg" className="recipe-image" alt="recipe" />
+        <div className="image-container">
+          <img src={recipe.imageUrl} className="recipe-image" alt="recipe" />
         </div>
         <div className="recipe-ingredients">
           <h2 className="sub-title">Ingredients</h2>
           <div className="recipe-ingredients-container">
             <ul>
-              <li>A vanilla cake sponge</li>
-              <li>600 grams frozen mixed berries</li>
-              <li>100 grams sugar </li>
-              <li>500 grams mascarpone cheese</li>
-              <li>600 grams Greek yogurt (10% fat)</li>
-              <li>200 grams sugar</li>
-              <li> 2 packets of vanilla sugar / vanilla essence </li>
-              <li>3 gelatin</li>
+              {recipe.ingredients.map((ingredient, index) => (
+                <li key={index}>{ingredient}</li>
+              ))}
             </ul>
           </div>
         </div>
@@ -30,27 +140,14 @@ function Recipe() {
       <div className="recipe-instructions">
         <div className="recipe-preparation">
           <h2 className="sub-title">Method of preparation</h2>
-          <p>
-            STEP 1: With an electric mixer, cream together mascarpone, agave
-            syrup and vanilla bean paste. Then add the powdered sugar and mix it
-            together until smooth. Add the heavy cream and whip it until stiff
-            peaks and it holds its shape.
-          </p>
-          <p>
-            STEP 2: Clean the berries. Slice the strawberries, blackberries and
-            raspberries into smaller pieces.
-          </p>
-          <p>
-            STEP 3: Add the first cake layer on a cake tray. Add ⅓ of the
-            mascarpone cream on the cake layer and even it out. Add ⅓ of the
-            berries in an even layer, slightly pressing them down into cream.
-            Continue and do the same with the next two layers.
-          </p>
+          {recipe.preparationMethod.split("\n").map((paragraph, index) => (
+            <p key={index}>{paragraph}</p>
+          ))}
         </div>
         <div className="recipe-video">
           <h2 className="sub-title">Video </h2>
           <video controls className="video-container">
-            <source src="./prajitura.mp4" type="video/mp4" />
+            <source src={recipe.videoUrl} type="video/mp4" />
           </video>
         </div>
       </div>
@@ -61,7 +158,7 @@ function Recipe() {
   */}
       <div className="recipe-comments">
         <h2 className="sub-title"> Comments </h2>
-        <div className="comments-container">
+        {/*<div className="comments-container">
           <div className="user-comment-detail">
             <img src="./girluser1.png" className="user-image" alt="user" />
             <p user-name>Irina Dubei</p>
@@ -120,8 +217,44 @@ function Recipe() {
               <DislikeOutlined />
             </Button>
           </div>
+        </div>*/}
+        {recipeComments.length > 0 ? (
+          recipeComments.map((comment, index) => (
+            <div className="comments-container" key={index}>
+              <div className="user-comment-detail">
+                <img
+                  src={comment.authorImageUrl}
+                  className="user-image"
+                  alt="user"
+                />
+                <p user-name>{comment.authorFullName}</p>
+              </div>
+              <div className="user-comment">
+                <p className="comment">{comment.comment}</p>
+              </div>
+              <div className="like-buttons">
+                <Button>
+                  <LikeOutlined />
+                </Button>
+                <Button>
+                  <DislikeOutlined />
+                </Button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="no-comments">No comments for this recipe yet.</p>
+        )}
+        <div className="add-comment" onClick={handleAddCommentClick}>
+          <p className="add-comment-title">Add a comment</p>
         </div>
       </div>
+      <AddCommentModal
+        visible={isAddCommentModalOpen}
+        onCancel={() => setIsAddCommentModalOpen(false)}
+        onCommentAdded={handleCommentAdded}
+        recipeId={id}
+      />
     </div>
   );
 }

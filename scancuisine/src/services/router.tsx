@@ -23,7 +23,7 @@ export const router = (
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Home />} />
       <Route path="/about" element={<About />} />
-      <Route path="/recipe" element={<Recipe />} />
+      <Route path="/recipe/:id" element={<Recipe />} />
     </Routes>
   </Router>
 );

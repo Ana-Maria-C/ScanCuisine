@@ -11,21 +11,21 @@ function Home() {
         <div className="latest-recipes">
           <h2>Latest Recipes</h2>
           <div className="recipes-container">
-            <CustomCard imageUrl="./mancare1.jpg" title="Soup" />
-            <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
-            <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
-            <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />
+            <CustomCard id="1" imageUrl="./mancare1.jpg" title="Soup" />
+            <CustomCard id="2" imageUrl="./mancare2.jpg" title="Lasagna" />
+            <CustomCard id="3" imageUrl="./mancare3.jpg" title="Pasta" />
+            <CustomCard id="4" imageUrl="./prajitura1.jpg" title="Lava Cake" />
+            <CustomCard id="5" imageUrl="./prajitura2.jpg" title="Berry Cake" />
           </div>
         </div>
         <div className="popular-recipes">
           <h2>Popular Recipes</h2>
           <div className="recipes-container">
-            <CustomCard imageUrl="./mancare1.jpg" title="Soup" />
-            <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
-            <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
-            <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />
+            <CustomCard id="1" imageUrl="./mancare1.jpg" title="Soup" />
+            <CustomCard id="2" imageUrl="./mancare2.jpg" title="Lasagna" />
+            <CustomCard id="3" imageUrl="./mancare3.jpg" title="Pasta" />
+            <CustomCard id="4" imageUrl="./prajitura1.jpg" title="Lava Cake" />
+            <CustomCard id="5" imageUrl="./prajitura2.jpg" title="Berry Cake" />
           </div>
         </div>
       </div>

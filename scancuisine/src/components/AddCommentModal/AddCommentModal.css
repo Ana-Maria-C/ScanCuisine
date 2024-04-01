@@ -1,0 +1,51 @@
+.comment-container {
+  /* background-color: rgba(243, 216, 249, 0.95);*/
+  background-color: #f4dcf6;
+  overflow-y: auto; /* Adaugă scroll vertical când conținutul este prea lung */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 8px;
+  padding: 30px;
+  margin: auto;
+  text-align: center;
+  border: 3px solid #36134c;
+  /*backdrop-filter: blur(50px);*/
+}
+
+.modal-title {
+  color: #36134c;
+}
+
+.comment-input {
+  border-radius: 5px;
+  margin-bottom: 15px; /* Adaugă spațiu între câmpuri */
+  padding: 10px; /* Adaugă un spațiu intern */
+  border: 1px solid #ccc; /* Adaugă o bordură */
+  width: 400px;
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.add-button,
+.close-button {
+  background-color: #36134c; /* Schimbă culoarea de fundal a butoanelor */
+  color: white; /* Schimbă culoarea textului butoanelor */
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.add-button:hover,
+.close-button:hover {
+  background-color: #5d1b7f; /* Schimbă culoarea butoanelor la hover */
+}

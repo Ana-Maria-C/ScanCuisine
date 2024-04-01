@@ -68,6 +68,14 @@ function AddRecipeModal({
     }));
   };
 
+  const fetchUserEmail = async () => {
+    const myToken = localStorage.getItem("token");
+    const response = await axios.get(
+      `http://localhost:8090/api/users/token/${myToken}`
+    );
+    return response.data.email;
+  };
+
   const handleAddClick = async () => {
     setRecipeData({
       id: "",
@@ -82,13 +90,11 @@ function AddRecipeModal({
       commentId: [],
     });
     onCancel();
-    const myToken = localStorage.getItem("token");
-    const response = await axios.get(
-      `http://localhost:8090/api/users/token/${myToken}`
-    );
+
+    const userEmail = await fetchUserEmail();
     setRecipeData((prevData) => ({
       ...prevData,
-      authorEmail: response.data.email,
+      authorEmail: userEmail,
     }));
     //console.log("Email:", response.data.email);
     console.log("Ingredients:", recipeData.ingredients);

@@ -29,6 +29,11 @@ public class RecipeCommentController {
         return recipeCommentService.getRecipeCommentById(id);
     }
 
+    @GetMapping("/recipe/{recipeId}")
+    public List<RecipeComment> getRecipeCommentsByRecipeId(@PathVariable String recipeId) throws ExecutionException, InterruptedException {
+        return recipeCommentService.getRecipeCommentsByRecipeId(recipeId);
+    }
+
     @PutMapping("/{id}")
     public String updateRecipeComment(@PathVariable String id, @RequestBody RecipeComment recipeComment) {
         return recipeCommentService.updateRecipeComment(id, recipeComment);
