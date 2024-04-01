@@ -176,4 +176,25 @@ public class UserService {
             return null;
         }
     }
+
+    public List<User> getFollowedPeople(String email) {
+        User user = getUserbyEmail(email);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+
+        List<String> followedPeopleEmails = user.getFollowedPeople();
+        if(followedPeopleEmails.isEmpty()) {
+            return new ArrayList<>();
+        }
+        List<User> followedPeople = new ArrayList<>();
+        for (String followedPeopleEmail : followedPeopleEmails) {
+            User followedPerson = getUserbyEmail(followedPeopleEmail);
+            if (followedPerson != null) {
+                followedPeople.add(followedPerson);
+            }
+        }
+
+        return followedPeople;
+    }
 }

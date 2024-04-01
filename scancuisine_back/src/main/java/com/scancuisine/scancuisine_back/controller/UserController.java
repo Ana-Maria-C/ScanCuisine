@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @RestController
@@ -65,6 +66,10 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/followedPeople/{email}")
+    public List<User> getFollowedPeople(@PathVariable String email) throws ExecutionException, InterruptedException {
+        return userService.getFollowedPeople(email);
+    }
     @PutMapping("/{email}/follow/{followerEmail}")
     public ResponseEntity<String> followUser(@PathVariable String email, @PathVariable String followerEmail) throws ExecutionException, InterruptedException {
         String result = userService.followUser(email, followerEmail);

@@ -100,6 +100,10 @@ h1 {
   flex: 1;
 }
 
+.following {
+  margin-bottom: 20px;
+}
+
 .myrecipes-container,
 .following-container {
   display: flex;
@@ -110,9 +114,9 @@ h1 {
   justify-content: center;
   /*pentru mai multe retete pe linie*/
 
-  /* margin-left: 80px;
-  margin-right: 80px;
-  flex-wrap: wrap;*/
+  margin-left: 10px;
+  margin-right: 10px;
+  flex-wrap: wrap;
 }
 
 .description-field,
@@ -145,6 +149,11 @@ h1 {
 .form-text.editing {
   border-color: #8e24aa;
   box-shadow: 0 0 5px rgba(68, 9, 91, 0.3);
+}
+
+.no-favorites-message,
+.no-following-message {
+  font-size: 1.2rem;
 }
 
 @media screen and (max-width: 1024px) {

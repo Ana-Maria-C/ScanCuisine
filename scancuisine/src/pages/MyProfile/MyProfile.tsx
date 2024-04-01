@@ -4,6 +4,32 @@ import CustomCard from "../../components/CustomCard/CustomCard";
 import UserCard from "../../components/UserCard/UserCard";
 import axios from "axios";
 import AddCard from "../../components/CustomCard/AddCard";
+import AddRecipeModal from "../../components/AddRecipeModal/AddRecipeModal";
+import { Button } from "antd";
+
+interface Recipe {
+  id: string;
+  authorEmail: string;
+  name: string;
+  ingredients: string[];
+  preparationMethod: string;
+  imageUrl: string;
+  category: string;
+  cuisine: string;
+  videoUrl: string;
+  commentId: string[];
+}
+
+interface FollowedPeople {
+  lastName: string;
+  firstName: string;
+  email: string;
+  description: string;
+  imageUrl: string;
+  myRecipes: string[];
+  myFavoriteRecipes: string[];
+  followedPeople: string[];
+}
 
 function MyProfile() {
   const [name, setName] = useState("");
@@ -12,6 +38,10 @@ function MyProfile() {
   const [isEditing, setIsEditing] = useState(false);
   const [description, setDescription] = useState("");
   const [isDescriptionEditing, setIsDescriptionEditing] = useState(false);
+  const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
+  const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
+  const [userFavoriteRecipes, setUserFavoriteRecipes] = useState<Recipe[]>([]);
+  const [followedPeople, setFollowedPeople] = useState<FollowedPeople[]>([]);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -34,6 +64,24 @@ function MyProfile() {
         setSurname(firstName);
         setEmail(email);
         setDescription(description);
+
+        // Fetch user recipes
+        const userRecipesResponse = await axios.get(
+          `http://localhost:8090/api/recipes/user/${email}`
+        );
+        setUserRecipes(userRecipesResponse.data);
+
+        // Fetch user favorite recipes
+        const userFavoriteRecipesResponse = await axios.get(
+          `http://localhost:8090/api/recipes/favorite/${email}`
+        );
+        setUserFavoriteRecipes(userFavoriteRecipesResponse.data);
+
+        // Fetch followed people
+        const followedPeopleResponse = await axios.get(
+          `http://localhost:8090/api/users/followedPeople/${email}`
+        );
+        setFollowedPeople(followedPeopleResponse.data);
       } catch (error) {
         console.error("Error fetching profile:", (error as Error).message);
       }
@@ -71,6 +119,27 @@ function MyProfile() {
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving profile:", (error as Error).message);
+    }
+  };
+
+  const handleAddRecipeClick = () => {
+    setIsAddRecipeModalOpen(true);
+  };
+
+  const handleRecipeAdded = async () => {
+    try {
+      const myToken = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8090/api/users/token/${myToken}`
+      );
+      const userEmail = response.data.email;
+
+      const userRecipesResponse = await axios.get(
+        `http://localhost:8090/api/recipes/user/${userEmail}`
+      );
+      setUserRecipes(userRecipesResponse.data);
+    } catch (error) {
+      console.error("Error fetching user recipes:", error);
     }
   };
 
@@ -174,34 +243,77 @@ function MyProfile() {
         <div className="myrecipes">
           <h2>My Recipes</h2>
           <div className="myrecipes-container">
-            <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
+            {/*} <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
             <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
             <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />
-            <AddCard imageUrl="./add.jpg" title="Add a recipe" />
+            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />*/}
+            {/* Display user's recipes */}
+            {userRecipes.length > 0 &&
+              userRecipes.map((recipe) => (
+                <CustomCard
+                  key={recipe.id}
+                  imageUrl={recipe.imageUrl}
+                  title={recipe.name}
+                />
+              ))}
+            <div onClick={handleAddRecipeClick}>
+              <AddCard imageUrl="./add.jpg" title="Add a recipe" />
+            </div>
           </div>
         </div>
         <div className="myfavorites">
           <h2>My Favorite Recipes</h2>
           <div className="myrecipes-container">
-            <CustomCard imageUrl="./mancare1.jpg" title="Soup" />
+            {/*<CustomCard imageUrl="./mancare1.jpg" title="Soup" />
             <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
             <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
             <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />
+            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />*/}
+            {/* Display user's favorite recipes */}
+            {userFavoriteRecipes.length > 0 ? (
+              userFavoriteRecipes.map((recipe) => (
+                <CustomCard
+                  key={recipe.id}
+                  imageUrl={recipe.imageUrl}
+                  title={recipe.name}
+                />
+              ))
+            ) : (
+              <div className="no-favorites-message">
+                You don't have any favorite recipes yet.
+              </div>
+            )}
           </div>
         </div>
         <div className="following">
           <h2>People I follow</h2>
           <div className="following-container">
-            <UserCard imageUrl="./girluser.png" title="Dubei Irina" />
+            {/*<UserCard imageUrl="./girluser.png" title="Dubei Irina" />
             <UserCard imageUrl="./boyuser1.png" title="Burada Alex" />
             <UserCard imageUrl="./boyuser2.png" title="Popescu Ioan" />
             <UserCard imageUrl="./girluser1.png" title="Catavencu Gabriela" />
-            <UserCard imageUrl="./girluser2.jpg" title="Chirica Alexia" />
+            <UserCard imageUrl="./girluser2.jpg" title="Chirica Alexia" />*/}
+            {followedPeople.length > 0 ? (
+              followedPeople.map((person) => (
+                <UserCard
+                  key={person.email}
+                  imageUrl={person.imageUrl}
+                  title={`${person.firstName} ${person.lastName}`}
+                />
+              ))
+            ) : (
+              <div className="no-following-message">
+                You are not following anyone yet.
+              </div>
+            )}
           </div>
         </div>
       </div>
+      <AddRecipeModal
+        visible={isAddRecipeModalOpen}
+        onCancel={() => setIsAddRecipeModalOpen(false)}
+        onRecipeAdded={handleRecipeAdded}
+      />
     </div>
   );
 }

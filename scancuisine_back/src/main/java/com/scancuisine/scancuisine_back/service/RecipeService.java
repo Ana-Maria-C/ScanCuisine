@@ -32,12 +32,36 @@ public class RecipeService {
             if (user == null) {
                 return "User with email " + recipe.getAuthorEmail() + " does not exist.";
             }
-            else{
-                user.getMyRecipes().add(recipe.getId());
-                this.userService.updateUser(recipe.getAuthorEmail(), user);
-                ApiFuture<WriteResult> collectionsApiFuture = recipesCollection.document(recipe.getId()).set(recipe);
-                return collectionsApiFuture.get().getUpdateTime().toString();
+            if(recipe.getIngredients().isEmpty())
+            {
+                return "Recipe must have at least one ingredient";
             }
+            if(recipe.getPreparationMethod().equals("")){
+                return "Recipe must have a preparation method";
+            }
+            if(recipe.getName().equals("")){
+                return "Recipe must have a name";
+            }
+            if(recipe.getCategory()==null || recipe.getCategory().equals("")){
+                recipe.setCategory("Other");
+            }
+            if(recipe.getCuisine()==null || recipe.getCategory().equals("")){
+                recipe.setCuisine("Other");
+            }
+            if(recipe.getImageUrl()==null || recipe.getCategory().equals("")){
+                recipe.setImageUrl("");
+            }
+            if(recipe.getVideoUrl()==null || recipe.getCategory().equals("")){
+                recipe.setVideoUrl("");
+            }
+            if(recipe.getCommentId().isEmpty()){
+                recipe.setCommentId(new ArrayList<>());
+            }
+            user.getMyRecipes().add(recipe.getId());
+            this.userService.updateUser(recipe.getAuthorEmail(), user);
+            ApiFuture<WriteResult> collectionsApiFuture = recipesCollection.document(recipe.getId()).set(recipe);
+            return collectionsApiFuture.get().getUpdateTime().toString();
+
         } else {
             return  "Recipe with id " + recipe.getId() + " already exists.";
         }
@@ -77,6 +101,28 @@ public class RecipeService {
             return null;
         }
     }
+
+    public List<Recipe> getRecipesOfUser(String email) {
+        User user = this.userService.getUserbyEmail(email);
+        if (user == null) {
+            return new ArrayList<>(); // Returnează o listă goală dacă utilizatorul nu există
+        }
+
+        List<String> recipeIds = user.getMyRecipes();
+        if(recipeIds.isEmpty()) {
+            return new ArrayList<>(); // Returnează o listă goală dacă utilizatorul nu are rețete
+        }
+
+        List<Recipe> recipes = new ArrayList<>();
+        for (String recipeId : recipeIds) {
+            Recipe recipe = this.getRecipebyId(recipeId);
+            if (recipe != null) {
+                recipes.add(recipe);
+            }
+        }
+        return recipes;
+    }
+
 
     public String updateRecipe(String id, Recipe recipe) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
@@ -159,5 +205,26 @@ public class RecipeService {
                 return this.userService.updateUser(email, user);
             }
         }
+    }
+
+    public List<Recipe> getFavoriteRecipesOfUser(String email) {
+        User user = this.userService.getUserbyEmail(email);
+        if (user == null) {
+            return new ArrayList<>(); // Returnează o listă goală dacă utilizatorul nu există
+        }
+
+        List<String> recipeIds = user.getMyFavoriteRecipes();
+        if(recipeIds.isEmpty()) {
+            return new ArrayList<>(); // Returnează o listă goală dacă utilizatorul nu are rețete favorite
+        }
+
+        List<Recipe> recipes = new ArrayList<>();
+        for (String recipeId : recipeIds) {
+            Recipe recipe = this.getRecipebyId(recipeId);
+            if (recipe != null) {
+                recipes.add(recipe);
+            }
+        }
+        return recipes;
     }
 }
