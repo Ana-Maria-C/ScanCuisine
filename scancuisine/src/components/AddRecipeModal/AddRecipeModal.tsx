@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import Modal from "react-modal";
 import "./AddRecipeModal.css";
 import axios from "axios";
+import { on } from "events";
 
 interface AddRecipeModalProps {
   visible: boolean;
@@ -59,13 +60,30 @@ function AddRecipeModal({
       }));
     }
   };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setRecipeData((prevData) => ({
       ...prevData,
       [e.target.name]: file,
     }));
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
+    }
+  };
+
+  const [previewVideo, setPreviewVideo] = useState<string | null>(null);
+  const handlevideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setRecipeData((prevData) => ({
+      ...prevData,
+      [e.target.name]: file,
+    }));
+    if (file) {
+      const videoUrl = URL.createObjectURL(file);
+      setPreviewVideo(videoUrl);
+    }
   };
 
   const fetchUserEmail = async () => {
@@ -116,6 +134,11 @@ function AddRecipeModal({
       console.error("Error adding recipe:", error);
     }
   };
+  const handleCancelClick = () => {
+    setPreviewImage(null);
+    setPreviewVideo(null);
+    onCancel();
+  };
 
   return (
     <Modal
@@ -154,9 +177,13 @@ function AddRecipeModal({
         <input
           type="file"
           name="photo"
+          title="Choose photo file"
           className="input-field photo"
-          onChange={handleFileChange}
+          onChange={handlePhotoFileChange}
         />
+        {previewImage && (
+          <img src={previewImage} alt="Image" className="preview-image" />
+        )}
         <input
           type="text"
           name="category"
@@ -176,14 +203,21 @@ function AddRecipeModal({
         <input
           type="file"
           name="video"
+          title="Choose video file"
           className="input-field video"
-          onChange={handleFileChange}
+          onChange={handlevideoFileChange}
         />
+        {previewVideo && (
+          <video controls className="preview-video">
+            <source src={previewVideo} type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        )}
         <div className="buttons-container">
           <button className="add-button" onClick={handleAddClick}>
             Add
           </button>
-          <button className="close-button" onClick={onCancel}>
+          <button className="close-button" onClick={handleCancelClick}>
             Close
           </button>
         </div>

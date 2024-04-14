@@ -1,0 +1,26 @@
+.search-results-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 10px;
+}
+
+.search-input {
+  height: 40px;
+}
+
+.search-recipes {
+  display: flex;
+  flex-direction: row;
+  color: #590865;
+  border: 1px solid #e0e0e0;
+  border-radius: 10px;
+  box-shadow: 0 0 10px 0 rgba(68, 9, 91, 0.1);
+  background-color: #fff;
+  padding: 20px;
+  margin-top: 20px;
+  flex: 1;
+  gap: 20px;
+}

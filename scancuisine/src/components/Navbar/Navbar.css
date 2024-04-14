@@ -8,6 +8,9 @@
   z-index: 1000;
   transition: top 0.3s; /* animație pentru tranziția de înălțime (apare/dispare) */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* adăugare umbre */
+  padding: 10px;
+  padding-left: 80px;
+  font-weight: bold;
 }
 
 .navbar.hidden {
@@ -35,10 +38,6 @@
   fill: #8e24aa; /* culoare mov pentru iconițe */
 }
 
-.navbar .myprofile {
-  margin-left: auto;
-}
-
 .navbar .logout {
-  margin-left: 60%;
+  margin-left: 50%;
 }

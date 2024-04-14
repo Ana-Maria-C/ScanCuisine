@@ -30,6 +30,11 @@ public class RecipeController {
         return recipeService.getRecipebyId(id);
     }
 
+    @GetMapping("/getByName/{name}")
+    public List<Recipe> getRecipesByName(@PathVariable String name) throws ExecutionException, InterruptedException {
+        return recipeService.getRecipesByName(name);
+    }
+
     @GetMapping("/user/{email}")
     public List<Recipe> getRecipesOfUser(@PathVariable String email) throws ExecutionException, InterruptedException {
         return recipeService.getRecipesOfUser(email);

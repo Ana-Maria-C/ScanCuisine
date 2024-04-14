@@ -64,3 +64,23 @@
 .close-button:hover {
   background-color: #5d1b7f; /* Schimbă culoarea butoanelor la hover */
 }
+
+.preview-image {
+  width: 96%;
+  max-width: 96%;
+  max-height: 500px;
+  border-radius: 5px;
+  margin-bottom: 15px; /* Adaugă spațiu între câmpuri */
+  padding: 10px; /* Adaugă un spațiu intern */
+  border: 1px solid #ccc; /* Adaugă o bordură */
+}
+
+.preview-video {
+  width: 96%;
+  max-width: 96%;
+  max-height: 500px;
+  border-radius: 5px;
+  margin-bottom: 15px; /* Adaugă spațiu între câmpuri */
+  padding: 10px; /* Adaugă un spațiu intern */
+  border: 1px solid #ccc; /* Adaugă o bordură */
+}
