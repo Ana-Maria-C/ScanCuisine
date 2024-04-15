@@ -229,12 +229,12 @@ public class RecipeService {
     }
 
     public List<Recipe> getRecipesByName(String name) throws ExecutionException, InterruptedException {
-       List<Recipe> recipes = new ArrayList<>();
-         for(Recipe recipe : this.getAllRecipes()){
-              if(recipe.getName().toLowerCase().contains(name.toLowerCase())){
+        List<Recipe> recipes = new ArrayList<>();
+        for(Recipe recipe : this.getAllRecipes()){
+            if(recipe.getName().toLowerCase().contains(name.toLowerCase())){
                 recipes.add(recipe);
-              }
-         }
+            }
+        }
         return recipes;
     }
 }

@@ -13,6 +13,7 @@ import Navbar from "../components/Navbar/Navbar";
 import MyProfile from "../pages/MyProfile/MyProfile";
 import Recipe from "../pages/Recipe/Recipe";
 import SearchResults from "../pages/SearchResults/SearchResults";
+import Test from "../pages/Test";
 
 export const router = (
   <Router>
@@ -26,6 +27,7 @@ export const router = (
       <Route path="/about" element={<About />} />
       <Route path="/recipe/:id" element={<Recipe />} />
       <Route path="/search" element={<SearchResults />} />
+      <Route path="/test" element={<Test />} />
     </Routes>
   </Router>
 );

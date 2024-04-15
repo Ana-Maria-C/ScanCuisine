@@ -3,6 +3,9 @@ import Modal from "react-modal";
 import "./AddRecipeModal.css";
 import axios from "axios";
 import { on } from "events";
+import { storage } from "../../firebase";
+import { ref, uploadBytes } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
 
 interface AddRecipeModalProps {
   visible: boolean;
@@ -16,7 +19,7 @@ interface RecipeData {
   name: string;
   ingredients: string[];
   preparationMethod: string;
-  imageUrl: File | null;
+  imageUrl: String | null;
   category: string;
   cuisine: string;
   videoUrl: File | null;
@@ -61,15 +64,32 @@ function AddRecipeModal({
     }
   };
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  const handlePhotoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePhotoFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
-    setRecipeData((prevData) => ({
-      ...prevData,
-      [e.target.name]: file,
-    }));
     if (file) {
       const imageUrl = URL.createObjectURL(file);
       setPreviewImage(imageUrl);
+
+      // opload image to storage
+      const imageName = `${file.name}_${uuidv4()}`; // Generate a unique name for the image
+      const imageRef = ref(storage, `images/${imageName}`);
+      //console.log("Image ref:", imageRef.name);
+
+      uploadBytes(imageRef, file)
+        .then((snapshot) => {
+          //alert("Image uploaded successfully");
+          console.log("Uploaded a blob or file!", snapshot);
+        })
+        .catch((error) => {
+          console.error("Error uploading image:", error);
+          //alert("Failed to upload image. Please try again.");
+        });
+      setRecipeData((prevData) => ({
+        ...prevData,
+        imageUrl: imageRef.name,
+      }));
     }
   };
 
@@ -107,6 +127,8 @@ function AddRecipeModal({
       videoUrl: null,
       commentId: [],
     });
+    setPreviewImage(null);
+    setPreviewVideo(null);
     onCancel();
 
     const userEmail = await fetchUserEmail();

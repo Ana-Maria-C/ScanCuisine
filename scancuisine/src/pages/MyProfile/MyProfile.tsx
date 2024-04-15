@@ -6,6 +6,8 @@ import axios from "axios";
 import AddCard from "../../components/CustomCard/AddCard";
 import AddRecipeModal from "../../components/AddRecipeModal/AddRecipeModal";
 import { Button } from "antd";
+import { storage } from "../../firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 
 interface Recipe {
   id: string;
@@ -69,12 +71,28 @@ function MyProfile() {
         const userRecipesResponse = await axios.get(
           `http://localhost:8090/api/recipes/user/${email}`
         );
+        // set the corect image url from storage
+        userRecipesResponse.data.forEach(async (recipe: Recipe) => {
+          const imageUrl = await getDownloadURL(
+            ref(storage, `images/${recipe.imageUrl}`)
+          );
+          recipe.imageUrl = imageUrl;
+          console.log("Recipe imageUrl:", imageUrl);
+        });
         setUserRecipes(userRecipesResponse.data);
 
         // Fetch user favorite recipes
         const userFavoriteRecipesResponse = await axios.get(
           `http://localhost:8090/api/recipes/favorite/${email}`
         );
+        // set the corect image url from storage
+        userFavoriteRecipesResponse.data.forEach(async (recipe: Recipe) => {
+          const imageUrl = await getDownloadURL(
+            ref(storage, `images/${recipe.imageUrl}`)
+          );
+          recipe.imageUrl = imageUrl;
+          console.log("Recipe imageUrl:", imageUrl);
+        });
         setUserFavoriteRecipes(userFavoriteRecipesResponse.data);
 
         // Fetch followed people
@@ -137,6 +155,14 @@ function MyProfile() {
       const userRecipesResponse = await axios.get(
         `http://localhost:8090/api/recipes/user/${userEmail}`
       );
+      // set the corect image url from storage
+      userRecipesResponse.data.forEach(async (recipe: Recipe) => {
+        const imageUrl = await getDownloadURL(
+          ref(storage, `images/${recipe.imageUrl}`)
+        );
+        recipe.imageUrl = imageUrl;
+        console.log("Recipe imageUrl:", imageUrl);
+      });
       setUserRecipes(userRecipesResponse.data);
     } catch (error) {
       console.error("Error fetching user recipes:", error);
