@@ -106,6 +106,10 @@ function Navbar() {
     }
   };
 
+  const handleMenuClick = (category: Category) => {
+    navigate(`/category/${category.name}`);
+  };
+
   return (
     <Menu
       mode="horizontal"
@@ -131,6 +135,7 @@ function Navbar() {
         {categories.map((category) => (
           <Menu.Item
             key={category.id}
+            onClick={() => handleMenuClick(category)}
             onMouseEnter={() => setIsPopupOpen(true)}
             onMouseLeave={() => setIsPopupOpen(false)}
           >
