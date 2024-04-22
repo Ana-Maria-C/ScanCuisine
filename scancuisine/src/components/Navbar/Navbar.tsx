@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, Button, Input, message } from "antd";
+import { Menu, Button, Input, message, Dropdown } from "antd";
 import { Link } from "react-router-dom";
 import {
   UserOutlined,
@@ -10,11 +10,29 @@ import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const { SubMenu } = Menu;
+
+interface Category {
+  id: string;
+  name: string;
+  recipeIds: string[];
+}
+
+interface Cuisine {
+  id: string;
+  name: string;
+  recipeIds: string[];
+}
+
 function Navbar() {
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const token = localStorage.getItem("token");
   const [searchValue, setSearchValue] = useState("");
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [cuisines, setCuisines] = useState<Cuisine[]>([]);
 
   const navigate = useNavigate();
 
@@ -35,6 +53,28 @@ function Navbar() {
       document.removeEventListener("mousemove", handleMouseMove);
     };
   }, [token]);
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:8090/api/category/all")
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch categories:", error);
+        message.error("Failed to fetch categories. Please try again.");
+      });
+    // fetch cuisines
+    axios
+      .get("http://localhost:8090/api/cuisine/all")
+      .then((response) => {
+        setCuisines(response.data);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch cuisines:", error);
+        message.error("Failed to fetch cuisines. Please try again.");
+      });
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -67,7 +107,10 @@ function Navbar() {
   };
 
   return (
-    <Menu mode="horizontal" className={`navbar ${visible ? "" : "hidden"}`}>
+    <Menu
+      mode="horizontal"
+      className={`navbar ${visible || isPopupOpen ? "" : "hidden"}`}
+    >
       <Menu.Item key="home">
         <Link to="/home">Scan Cuisine</Link>
       </Menu.Item>
@@ -80,12 +123,36 @@ function Navbar() {
           onChange={(e) => setSearchValue(e.target.value)}
         />
       </Menu.Item>
-      <Menu.Item key="categories">
-        <Link to="">Categories</Link>
-      </Menu.Item>
-      <Menu.Item key="cuisines">
-        <Link to="">Cuisines</Link>
-      </Menu.Item>
+      <SubMenu
+        key="categories"
+        title={<span className="categories-submenu">Categories</span>}
+        popupClassName="categories-popup"
+      >
+        {categories.map((category) => (
+          <Menu.Item
+            key={category.id}
+            onMouseEnter={() => setIsPopupOpen(true)}
+            onMouseLeave={() => setIsPopupOpen(false)}
+          >
+            {category.name}
+          </Menu.Item>
+        ))}
+      </SubMenu>
+      <SubMenu
+        key="cuisines"
+        title={<span className="categories-submenu">Cuisines</span>}
+        popupClassName="cuisines-popup"
+      >
+        {cuisines.map((cuisine) => (
+          <Menu.Item
+            key={cuisine.id}
+            onMouseEnter={() => setIsPopupOpen(true)}
+            onMouseLeave={() => setIsPopupOpen(false)}
+          >
+            {cuisine.name}
+          </Menu.Item>
+        ))}
+      </SubMenu>
       <Menu.Item key="scan" className="camera-scan">
         <CameraOutlined />
       </Menu.Item>

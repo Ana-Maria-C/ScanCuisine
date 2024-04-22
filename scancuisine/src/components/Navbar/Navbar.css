@@ -18,7 +18,8 @@
 }
 
 /* Stil pentru link-uri */
-.navbar .ant-menu-item a {
+.navbar .ant-menu-item a,
+.categories-submenu {
   color: #8e24aa; /* culoare mov pentru link-uri */
 }
 
