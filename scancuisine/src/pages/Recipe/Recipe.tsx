@@ -41,6 +41,42 @@ function Recipe() {
   const [recipeComments, setRecipeComments] = useState<RecipeComments[]>([]);
   const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
 
+  const fetchRecipeComments = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recipe-comments/recipe/${id}`
+      );
+      const commentsData = response.data;
+      const commentsWithUserDetails = await Promise.all(
+        commentsData.map(async (comment: Comment) => {
+          try {
+            const userResponse = await axios.get(
+              `http://localhost:8090/api/users/${comment.authorEmail}`
+            );
+            console.log("User details for comment:", userResponse.data);
+
+            const fullName = `${userResponse.data.firstName} ${userResponse.data.lastName}`; // Concatenează numele și prenumele
+            return {
+              authorFullName: fullName,
+              authorImageUrl: userResponse.data.imageUrl,
+              comment: comment.comment,
+            };
+          } catch (error) {
+            console.error("Error fetching user details:", error);
+            return null;
+          }
+        })
+      );
+      const validCommentsWithUserDetails = commentsWithUserDetails.filter(
+        (comment) => comment !== null
+      );
+      setRecipeComments(validCommentsWithUserDetails);
+      console.log("Comments:", validCommentsWithUserDetails);
+    } catch (error) {
+      console.error("Error fetching recipe comments:", error);
+    }
+  };
+
   useEffect(() => {
     const fetchRecipe = async () => {
       try {
@@ -52,42 +88,6 @@ function Recipe() {
       } catch (error) {
         console.error("Error fetching recipe:", error);
         setLoading(false);
-      }
-    };
-
-    const fetchRecipeComments = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8090/api/recipe-comments/recipe/${id}`
-        );
-        const commentsData = response.data;
-        const commentsWithUserDetails = await Promise.all(
-          commentsData.map(async (comment: Comment) => {
-            try {
-              const userResponse = await axios.get(
-                `http://localhost:8090/api/users/${comment.authorEmail}`
-              );
-              console.log("User details for comment:", userResponse.data);
-
-              const fullName = `${userResponse.data.firstName} ${userResponse.data.lastName}`; // Concatenează numele și prenumele
-              return {
-                authorFullName: fullName,
-                authorImageUrl: userResponse.data.imageUrl,
-                comment: comment.comment,
-              };
-            } catch (error) {
-              console.error("Error fetching user details:", error);
-              return null;
-            }
-          })
-        );
-        const validCommentsWithUserDetails = commentsWithUserDetails.filter(
-          (comment) => comment !== null
-        );
-        setRecipeComments(validCommentsWithUserDetails);
-        console.log("Comments:", validCommentsWithUserDetails);
-      } catch (error) {
-        console.error("Error fetching recipe comments:", error);
       }
     };
 
@@ -110,13 +110,9 @@ function Recipe() {
   const handleCommentAdded = async () => {
     try {
       // Reîmprospătăm lista de comentarii după adăugarea unui nou comentariu
-      const response = await axios.get(
-        `http://localhost:8090/api/recipe-comments/recipe/${id}`
-      );
-      const newComment = response.data;
-      setRecipeComments((prevComments) => [...prevComments, newComment]);
+      await fetchRecipeComments();
     } catch (error) {
-      console.error("Error fetching comments for this recipe:", error);
+      console.error("Error fetching recipe comments:", error);
     }
   };
   return (

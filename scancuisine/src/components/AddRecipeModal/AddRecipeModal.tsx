@@ -4,7 +4,7 @@ import "./AddRecipeModal.css";
 import axios from "axios";
 import { on } from "events";
 import { storage } from "../../firebase";
-import { ref, uploadBytes } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 
 interface AddRecipeModalProps {
@@ -72,24 +72,25 @@ function AddRecipeModal({
       const imageUrl = URL.createObjectURL(file);
       setPreviewImage(imageUrl);
 
-      // opload image to storage
-      const imageName = `${file.name}_${uuidv4()}`; // Generate a unique name for the image
+      const imageName = `${file.name}_${uuidv4()}`;
       const imageRef = ref(storage, `images/${imageName}`);
-      //console.log("Image ref:", imageRef.name);
 
-      uploadBytes(imageRef, file)
-        .then((snapshot) => {
-          //alert("Image uploaded successfully");
-          console.log("Uploaded a blob or file!", snapshot);
-        })
-        .catch((error) => {
-          console.error("Error uploading image:", error);
-          //alert("Failed to upload image. Please try again.");
-        });
-      setRecipeData((prevData) => ({
-        ...prevData,
-        imageUrl: imageRef.name,
-      }));
+      try {
+        // Încărcați fișierul în storage
+        const snapshot = await uploadBytes(imageRef, file);
+
+        // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
+        const imageUrlDownload = await getDownloadURL(imageRef);
+
+        // Actualizați state-ul cu URL-ul de descărcare
+        setRecipeData((prevData) => ({
+          ...prevData,
+          imageUrl: imageUrlDownload,
+        }));
+      } catch (error) {
+        console.error("Error uploading image:", error);
+        // Aici puteți gestiona erorile de încărcare a imaginii
+      }
     }
   };
 

@@ -57,38 +57,39 @@ function AddCommentModal({
       console.error("Recipe ID is not defined!");
       return;
     }
-    setCommentData({
-      id: "",
-      recipeId: "",
-      authorEmail: "",
-      comment: "",
-      likesCount: 0,
-      dislikesCount: 0,
-    });
-    onCancel();
+
     const myToken = localStorage.getItem("token");
-    const response = await axios.get(
-      `http://localhost:8090/api/users/token/${myToken}`
-    );
-    setCommentData((prevData) => ({
-      ...prevData,
-      authorEmail: response.data.email,
-      recipeId: recipeId,
-    }));
-    console.log("Comment data:", commentData);
 
     try {
+      const response = await axios.get(
+        `http://localhost:8090/api/users/token/${myToken}`
+      );
+      const userEmail = response.data.email;
+
+      // Actualizează comentariul cu emailul și recipeId-ul
+      const updatedCommentData = {
+        ...commentData,
+        authorEmail: userEmail,
+        recipeId: recipeId,
+      };
+
+      // Trimite datele actualizate către server
       const addedComment = await axios.post(
         `http://localhost:8090/api/recipe-comments`,
-        commentData
+        updatedCommentData
       );
-      console.log("Comment added:", addedComment);
-    } catch (error) {
-      console.error("Error adding comment:", error);
-    }
+      // Resetează formularul și apelează funcția de notificare a adăugării comentariului
+      setCommentData({
+        id: "",
+        recipeId: "",
+        authorEmail: "",
+        comment: "",
+        likesCount: 0,
+        dislikesCount: 0,
+      });
 
-    try {
       onCommentAdded();
+      onCancel(); // Închide modalul după adăugarea comentariului
     } catch (error) {
       console.error("Error adding comment:", error);
     }

@@ -72,13 +72,14 @@ function MyProfile() {
           `http://localhost:8090/api/recipes/user/${email}`
         );
         // set the corect image url from storage
-        userRecipesResponse.data.forEach(async (recipe: Recipe) => {
+        /* userRecipesResponse.data.forEach(async (recipe: Recipe) => {
           const imageUrl = await getDownloadURL(
             ref(storage, `images/${recipe.imageUrl}`)
           );
           recipe.imageUrl = imageUrl;
           console.log("Recipe imageUrl:", imageUrl);
         });
+        */
         setUserRecipes(userRecipesResponse.data);
 
         // Fetch user favorite recipes
@@ -86,13 +87,14 @@ function MyProfile() {
           `http://localhost:8090/api/recipes/favorite/${email}`
         );
         // set the corect image url from storage
-        userFavoriteRecipesResponse.data.forEach(async (recipe: Recipe) => {
+        /*userFavoriteRecipesResponse.data.forEach(async (recipe: Recipe) => {
           const imageUrl = await getDownloadURL(
             ref(storage, `images/${recipe.imageUrl}`)
           );
           recipe.imageUrl = imageUrl;
           console.log("Recipe imageUrl:", imageUrl);
         });
+        */
         setUserFavoriteRecipes(userFavoriteRecipesResponse.data);
 
         // Fetch followed people
@@ -155,14 +157,16 @@ function MyProfile() {
       const userRecipesResponse = await axios.get(
         `http://localhost:8090/api/recipes/user/${userEmail}`
       );
-      // set the corect image url from storage
-      userRecipesResponse.data.forEach(async (recipe: Recipe) => {
-        const imageUrl = await getDownloadURL(
-          ref(storage, `images/${recipe.imageUrl}`)
-        );
-        recipe.imageUrl = imageUrl;
-        console.log("Recipe imageUrl:", imageUrl);
-      });
+      // Wait for all download URLs to be fetched
+      /*const recipesWithImages = await Promise.all(
+        userRecipesResponse.data.map(async (recipe: Recipe) => {
+          const imageUrl = await getDownloadURL(
+            ref(storage, `images/${recipe.imageUrl}`)
+          );
+          return { ...recipe, imageUrl };
+        })
+      );
+      */
       setUserRecipes(userRecipesResponse.data);
     } catch (error) {
       console.error("Error fetching user recipes:", error);

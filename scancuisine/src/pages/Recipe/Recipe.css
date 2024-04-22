@@ -170,6 +170,14 @@
   margin-top: 15px;
 }
 
+.recipe-image {
+  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+}
+
 @media screen and (max-width: 1024px) {
   .recipe-container {
     align-items: center;
