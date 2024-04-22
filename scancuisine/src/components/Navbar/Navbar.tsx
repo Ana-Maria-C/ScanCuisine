@@ -80,6 +80,12 @@ function Navbar() {
           onChange={(e) => setSearchValue(e.target.value)}
         />
       </Menu.Item>
+      <Menu.Item key="categories">
+        <Link to="">Categories</Link>
+      </Menu.Item>
+      <Menu.Item key="cuisines">
+        <Link to="">Cuisines</Link>
+      </Menu.Item>
       <Menu.Item key="scan" className="camera-scan">
         <CameraOutlined />
       </Menu.Item>

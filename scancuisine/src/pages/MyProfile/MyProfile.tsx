@@ -67,40 +67,19 @@ function MyProfile() {
         setEmail(email);
         setDescription(description);
 
-        // Fetch user recipes
-        const userRecipesResponse = await axios.get(
-          `http://localhost:8090/api/recipes/user/${email}`
-        );
-        // set the corect image url from storage
-        /* userRecipesResponse.data.forEach(async (recipe: Recipe) => {
-          const imageUrl = await getDownloadURL(
-            ref(storage, `images/${recipe.imageUrl}`)
-          );
-          recipe.imageUrl = imageUrl;
-          console.log("Recipe imageUrl:", imageUrl);
-        });
-        */
+        // Fetch user recipes, favorite recipes and follwedPeople in parallel
+        const [
+          userRecipesResponse,
+          userFavoriteRecipesResponse,
+          followedPeopleResponse,
+        ] = await Promise.all([
+          axios.get(`http://localhost:8090/api/recipes/user/${email}`),
+          axios.get(`http://localhost:8090/api/recipes/favorite/${email}`),
+          axios.get(`http://localhost:8090/api/users/followedPeople/${email}`),
+        ]);
+
         setUserRecipes(userRecipesResponse.data);
-
-        // Fetch user favorite recipes
-        const userFavoriteRecipesResponse = await axios.get(
-          `http://localhost:8090/api/recipes/favorite/${email}`
-        );
-        // set the corect image url from storage
-        /*userFavoriteRecipesResponse.data.forEach(async (recipe: Recipe) => {
-          const imageUrl = await getDownloadURL(
-            ref(storage, `images/${recipe.imageUrl}`)
-          );
-          recipe.imageUrl = imageUrl;
-          console.log("Recipe imageUrl:", imageUrl);
-        });
-        */
         setUserFavoriteRecipes(userFavoriteRecipesResponse.data);
-
-        // Fetch followed people
-        const followedPeopleResponse = await axios.get(
-          `http://localhost:8090/api/users/followedPeople/${email}`
-        );
         setFollowedPeople(followedPeopleResponse.data);
       } catch (error) {
         console.error("Error fetching profile:", (error as Error).message);
@@ -157,16 +136,6 @@ function MyProfile() {
       const userRecipesResponse = await axios.get(
         `http://localhost:8090/api/recipes/user/${userEmail}`
       );
-      // Wait for all download URLs to be fetched
-      /*const recipesWithImages = await Promise.all(
-        userRecipesResponse.data.map(async (recipe: Recipe) => {
-          const imageUrl = await getDownloadURL(
-            ref(storage, `images/${recipe.imageUrl}`)
-          );
-          return { ...recipe, imageUrl };
-        })
-      );
-      */
       setUserRecipes(userRecipesResponse.data);
     } catch (error) {
       console.error("Error fetching user recipes:", error);
@@ -345,6 +314,7 @@ function MyProfile() {
         visible={isAddRecipeModalOpen}
         onCancel={() => setIsAddRecipeModalOpen(false)}
         onRecipeAdded={handleRecipeAdded}
+        authorEmail={email}
       />
     </div>
   );

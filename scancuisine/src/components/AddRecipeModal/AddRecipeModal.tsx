@@ -6,11 +6,13 @@ import { on } from "events";
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
+import imageCompression from "browser-image-compression";
 
 interface AddRecipeModalProps {
   visible: boolean;
   onCancel: () => void;
   onRecipeAdded: () => void;
+  authorEmail: string;
 }
 
 interface RecipeData {
@@ -22,7 +24,7 @@ interface RecipeData {
   imageUrl: String | null;
   category: string;
   cuisine: string;
-  videoUrl: File | null;
+  videoUrl: String | null;
   commentId: string[];
 }
 
@@ -30,10 +32,12 @@ function AddRecipeModal({
   visible,
   onCancel,
   onRecipeAdded,
+  authorEmail,
 }: AddRecipeModalProps) {
+  console.log("Author email:", authorEmail);
   const [recipeData, setRecipeData] = useState<RecipeData>({
     id: "",
-    authorEmail: "",
+    authorEmail: authorEmail,
     name: "",
     ingredients: [],
     preparationMethod: "",
@@ -69,13 +73,18 @@ function AddRecipeModal({
   ) => {
     const file = e.target.files?.[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
-
-      const imageName = `${file.name}_${uuidv4()}`;
-      const imageRef = ref(storage, `images/${imageName}`);
-
       try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 500,
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(file, options);
+        const imageUrl = URL.createObjectURL(compressedFile);
+        setPreviewImage(imageUrl);
+
+        const imageName = `${file.name}_${uuidv4()}`;
+        const imageRef = ref(storage, `images/${imageName}`);
         // Încărcați fișierul în storage
         const snapshot = await uploadBytes(imageRef, file);
 
@@ -88,37 +97,80 @@ function AddRecipeModal({
           imageUrl: imageUrlDownload,
         }));
       } catch (error) {
-        console.error("Error uploading image:", error);
-        // Aici puteți gestiona erorile de încărcare a imaginii
+        console.error("Error compressing image:", error);
       }
     }
   };
 
   const [previewVideo, setPreviewVideo] = useState<string | null>(null);
-  const handlevideoFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleVideoFileChange = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
-    setRecipeData((prevData) => ({
-      ...prevData,
-      [e.target.name]: file,
-    }));
+
     if (file) {
-      const videoUrl = URL.createObjectURL(file);
-      setPreviewVideo(videoUrl);
+      try {
+        const videoUrl = URL.createObjectURL(file);
+        setPreviewVideo(videoUrl);
+
+        const videoName = `${file.name}_${uuidv4()}`;
+        const videoRef = ref(storage, `videos/${videoName}`);
+        // Încărcați fișierul în storage
+        const snapshot = await uploadBytes(videoRef, file);
+
+        // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
+        const videoUrlDownload = await getDownloadURL(videoRef);
+
+        // Actualizați state-ul cu URL-ul de descărcare
+        setRecipeData((prevData) => ({
+          ...prevData,
+          videoUrl: videoUrlDownload,
+        }));
+
+        console.log("Video URL:", videoUrlDownload);
+      } catch (error) {
+        console.error("Error uploading video:", error);
+      }
     }
   };
 
-  const fetchUserEmail = async () => {
-    const myToken = localStorage.getItem("token");
-    const response = await axios.get(
-      `http://localhost:8090/api/users/token/${myToken}`
-    );
-    return response.data.email;
+  /*const fetchUserEmail = async () => {
+    try {
+      const myToken = localStorage.getItem("token");
+      console.log("Token:", myToken);
+      const response = await axios.get(
+        `http://localhost:8090/api/users/token/${myToken}`
+      );
+      return response.data.email;
+    } catch (error) {
+      console.error("Error fetching user email:", error);
+    }
   };
-
+*/
   const handleAddClick = async () => {
+    setRecipeData((prevData) => ({
+      ...prevData,
+      authorEmail: authorEmail,
+    }));
+
+    try {
+      console.log("Recipe data:", recipeData);
+      const addedRecipe = await axios.post(
+        `http://localhost:8090/api/recipes`,
+        recipeData
+      );
+    } catch (error) {
+      console.error("Error adding recipe:", error);
+    }
+
+    try {
+      onRecipeAdded();
+    } catch (error) {
+      console.error("Error adding recipe:", error);
+    }
     setRecipeData({
       id: "",
-      authorEmail: "",
+      authorEmail: authorEmail,
       name: "",
       ingredients: [],
       preparationMethod: "",
@@ -131,31 +183,6 @@ function AddRecipeModal({
     setPreviewImage(null);
     setPreviewVideo(null);
     onCancel();
-
-    const userEmail = await fetchUserEmail();
-    setRecipeData((prevData) => ({
-      ...prevData,
-      authorEmail: userEmail,
-    }));
-    //console.log("Email:", response.data.email);
-    console.log("Ingredients:", recipeData.ingredients);
-    console.log("Recipe added:", recipeData);
-
-    try {
-      const addedRecipe = await axios.post(
-        `http://localhost:8090/api/recipes`,
-        recipeData
-      );
-      console.log("Recipe added:", addedRecipe);
-    } catch (error) {
-      console.error("Error adding recipe:", error);
-    }
-
-    try {
-      onRecipeAdded();
-    } catch (error) {
-      console.error("Error adding recipe:", error);
-    }
   };
   const handleCancelClick = () => {
     setPreviewImage(null);
@@ -228,7 +255,7 @@ function AddRecipeModal({
           name="video"
           title="Choose video file"
           className="input-field video"
-          onChange={handlevideoFileChange}
+          onChange={handleVideoFileChange}
         />
         {previewVideo && (
           <video controls className="preview-video">
