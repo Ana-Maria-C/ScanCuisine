@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Modal from "react-modal";
 import "./AddRecipeModal.css";
 import axios from "axios";
-import { on } from "events";
 import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
+import { Select, message } from "antd";
+
+const { Option } = Select;
 
 interface AddRecipeModalProps {
   visible: boolean;
@@ -28,13 +30,24 @@ interface RecipeData {
   commentId: string[];
 }
 
+interface Category {
+  id: string;
+  name: string;
+  recipeIds: string[];
+}
+
+interface Cuisine {
+  id: string;
+  name: string;
+  recipeIds: string[];
+}
+
 function AddRecipeModal({
   visible,
   onCancel,
   onRecipeAdded,
   authorEmail,
 }: AddRecipeModalProps) {
-  console.log("Author email:", authorEmail);
   const [recipeData, setRecipeData] = useState<RecipeData>({
     id: "",
     authorEmail: authorEmail,
@@ -48,9 +61,41 @@ function AddRecipeModal({
     commentId: [],
   });
 
+  const [inputCategoryValue, setInputCategoryValue] = useState("");
+  const [inputCuisineValue, setInputCuisineValue] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [cuisines, setCuisines] = useState<Cuisine[]>([]);
+
+  const [categoryList, setCategoryList] = useState<string[]>([]);
+  const [cuisineList, setCuisineList] = useState<string[]>([]);
+
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8090/api/category/all"
+      );
+      setCategories(response.data);
+      setCategoryList(response.data.map((category: Category) => category.name));
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const fetchCuisines = async () => {
+    try {
+      const response = await axios.get("http://localhost:8090/api/cuisine/all");
+      setCuisines(response.data);
+      setCuisineList(response.data.map((cuisine: Cuisine) => cuisine.name));
+    } catch (error) {
+      console.error("Error fetching cuisines:", error);
+    }
+  };
+
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
+    fetchCategories();
+    fetchCuisines();
     const { name, value } = e.target;
     if (name === "ingredients") {
       const ingredientsArray = value
@@ -67,6 +112,7 @@ function AddRecipeModal({
       }));
     }
   };
+
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const handlePhotoFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>
@@ -126,8 +172,6 @@ function AddRecipeModal({
           ...prevData,
           videoUrl: videoUrlDownload,
         }));
-
-        console.log("Video URL:", videoUrlDownload);
       } catch (error) {
         console.error("Error uploading video:", error);
       }
@@ -234,22 +278,50 @@ function AddRecipeModal({
         {previewImage && (
           <img src={previewImage} alt="Image" className="preview-image" />
         )}
-        <input
-          type="text"
-          name="category"
-          className="input-field"
-          placeholder="Category"
-          value={recipeData.category}
-          onChange={handleInputChange}
-        />
-        <input
-          type="text"
-          name="cuisine"
-          className="input-field"
-          placeholder="Cuisine"
-          value={recipeData.cuisine}
-          onChange={handleInputChange}
-        />
+        <Select
+          className="input-field-category"
+          placeholder="Select a category"
+          value={recipeData.category || undefined}
+          allowClear
+          showSearch
+          onSearch={(value) => setInputCategoryValue(value)}
+          onChange={(value) =>
+            setRecipeData((prevData) => ({
+              ...prevData,
+              category: value,
+            }))
+          }
+        >
+          {(categoryList || [])
+            .concat(inputCategoryValue || [])
+            .map((category) => (
+              <Option key={category} value={category}>
+                {category}
+              </Option>
+            ))}
+        </Select>
+        <Select
+          className="input-field-category"
+          placeholder="Select a cuisine"
+          value={recipeData.cuisine || undefined}
+          allowClear
+          showSearch
+          onSearch={(value) => setInputCuisineValue(value)}
+          onChange={(value) =>
+            setRecipeData((prevData) => ({
+              ...prevData,
+              cuisine: value,
+            }))
+          }
+        >
+          {(cuisineList || [])
+            .concat(inputCuisineValue || [])
+            .map((cuisine) => (
+              <Option key={cuisine} value={cuisine}>
+                {cuisine}
+              </Option>
+            ))}
+        </Select>
         <input
           type="file"
           name="video"
