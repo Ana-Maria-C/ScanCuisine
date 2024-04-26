@@ -31,13 +31,13 @@ public class CategoryController {
     }
 
     @GetMapping("/recipes/{categoryName}")
-    public List<Recipe> getRecipesByCategory(@PathVariable String categoryName) {
+    public List<Recipe> getRecipesByCategory(@PathVariable String categoryName) throws ExecutionException, InterruptedException {
         return categoryService.getRecipesByCategory(categoryName);
     }
 
     @PutMapping("/{name}")
-    public String updateCategory(@PathVariable String name, @RequestBody String recipeId) {
-        return categoryService.updateCategory(name, recipeId);
+    public String updateCategory(@PathVariable String name) {
+        return categoryService.updateCategory(name);
     }
 
     @DeleteMapping("/{name}")

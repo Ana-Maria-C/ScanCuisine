@@ -27,8 +27,12 @@ public class CategoryService {
 
         if (querySnapshot.isEmpty()) {
             category.setId();
+            if(category.getRecipeIds().isEmpty()){
+                category.setRecipeIds(new ArrayList<>());
+            }
             ApiFuture<WriteResult> collectionsApiFuture = categoryCollection.document(category.getName()).set(category);
-            return collectionsApiFuture.get().getUpdateTime().toString();
+            // return the category
+            return category.toString();
         } else {
             return "Category with name " + category.getName() + " already exists.";
         }
@@ -72,7 +76,7 @@ public class CategoryService {
         }
     }
 
-    public String updateCategory(String name, String recipeId) {
+    public String updateCategory(String name) {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(name);
         ApiFuture<DocumentSnapshot> future = documentReference.get();
@@ -82,12 +86,14 @@ public class CategoryService {
             if (document.exists()) {
                 Category category = document.toObject(Category.class);
                 assert category != null;
-                if(category.getRecipeIds().contains(recipeId)){
-                    return "Category with name " + name + " already contains recipe with id " + recipeId;
+                // add to category all the recipe ids that are not already in the category
+                for (Recipe recipe : recipeService.getAllRecipes()) {
+                    if (!category.getRecipeIds().contains(recipe.getId()) && recipe.getCategory().equals(name)) {
+                        category.getRecipeIds().add(recipe.getId());
+                    }
                 }
-                category.getRecipeIds().add(recipeId);
                 ApiFuture<WriteResult> collectionsApiFuture = documentReference.set(category);
-                return collectionsApiFuture.get().getUpdateTime().toString();
+                return document.toObject(Category.class).toString();
             } else {
                 return "Category with name " + name + " does not exist.";
             }
@@ -117,13 +123,12 @@ public class CategoryService {
         }
     }
 
-    public List<Recipe> getRecipesByCategory(String categoryName) {
+    public List<Recipe> getRecipesByCategory(String categoryName) throws ExecutionException, InterruptedException {
         Category category = getCategoryByName(categoryName);
         List<Recipe> recipes = new ArrayList<>();
         if (category != null) {
-            for (String recipeId : category.getRecipeIds()) {
-                Recipe recipe = recipeService.getRecipebyId(recipeId);
-                if (recipe != null) {
+            for (Recipe recipe : recipeService.getAllRecipes()) {
+                if (recipe.getCategory().equals(categoryName)) {
                     recipes.add(recipe);
                 }
             }

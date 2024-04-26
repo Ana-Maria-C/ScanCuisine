@@ -29,7 +29,7 @@ public class CuisineService {
         if (querySnapshot.isEmpty()) {
             cuisine.setId();
             ApiFuture<WriteResult> collectionsApiFuture = cuisineCollection.document(cuisine.getName()).set(cuisine);
-            return collectionsApiFuture.get().getUpdateTime().toString();
+            return cuisine.toString();
         } else {
             return "Cuisine with name " + cuisine.getName() + " already exists.";
         }
@@ -68,7 +68,7 @@ public class CuisineService {
         return cuisine;
     }
 
-    public String updateCuisine(String name, String recipeId) {
+    public String updateCuisine(String name) {
             Firestore db = FirestoreClient.getFirestore();
             DocumentReference documentReference = db.collection(COLLECTION_NAME).document(name);
             ApiFuture<DocumentSnapshot> future = documentReference.get();
@@ -78,12 +78,13 @@ public class CuisineService {
                 if(document.exists()){
                     Cuisine cuisine = document.toObject(Cuisine.class);
                     assert cuisine != null;
-                    if(cuisine.getRecipeIds().contains(recipeId)){
-                        return "Recipe with id " + recipeId + " already exists in cuisine " + name;
+                    for (Recipe recipe : recipeService.getAllRecipes()) {
+                        if (!cuisine.getRecipeIds().contains(recipe.getId()) && recipe.getCuisine().equals(name)) {
+                            cuisine.getRecipeIds().add(recipe.getId());
+                        }
                     }
-                    cuisine.getRecipeIds().add(recipeId);
                     ApiFuture<WriteResult> collectionsApiFuture = documentReference.set(cuisine);
-                    return collectionsApiFuture.get().getUpdateTime().toString();
+                    return document.toObject(Cuisine.class).toString();
                 } else {
                     return "Cuisine with name " + name + " does not exist.";
                 }
@@ -114,13 +115,12 @@ public class CuisineService {
         }
     }
 
-    public List<Recipe> getRecipesByCuisine(String cuisineName) {
+    public List<Recipe> getRecipesByCuisine(String cuisineName) throws ExecutionException, InterruptedException {
         Cuisine cuisine = getCuisineByName(cuisineName);
         List<Recipe> recipes = new ArrayList<>();
-        if (cuisine != null) {
-            for (String recipeId : cuisine.getRecipeIds()) {
-                Recipe recipe = recipeService.getRecipebyId(recipeId);
-                if (recipe != null) {
+        if(cuisine != null){
+            for(Recipe recipe : recipeService.getAllRecipes()){
+                if(recipe.getCuisine().equals(cuisineName)) {
                     recipes.add(recipe);
                 }
             }

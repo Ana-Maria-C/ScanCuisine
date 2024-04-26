@@ -75,6 +75,8 @@ function AddRecipeModal({
         "http://localhost:8090/api/category/all"
       );
       setCategories(response.data);
+      // setCategoryList to an empty array to clear the previous category list
+      setCategoryList([]);
       setCategoryList(response.data.map((category: Category) => category.name));
     } catch (error) {
       console.error("Error fetching categories:", error);
@@ -198,11 +200,74 @@ function AddRecipeModal({
     }));
 
     try {
+      // create the recipe
       console.log("Recipe data:", recipeData);
       const addedRecipe = await axios.post(
         `http://localhost:8090/api/recipes`,
         recipeData
       );
+
+      //verify if category exists
+      const categoryExists = categories.find(
+        (category) => category.name === recipeData.category
+      );
+      if (!categoryExists) {
+        //create the category
+        const addedCategory: Category = {
+          id: "",
+          name: recipeData.category,
+          recipeIds: [""],
+        };
+        const newCategory = await axios.post(
+          `http://localhost:8090/api/category`,
+          addedCategory
+        );
+        // add recipe to category
+        if (newCategory.data) {
+          const updatedCategory = await axios.put(
+            `http://localhost:8090/api/category/${recipeData.category}`
+          );
+        } else {
+          console.error("Error adding category:", newCategory);
+        }
+      } else {
+        // add recipe to category
+        const updatedCategory = await axios.put(
+          `http://localhost:8090/api/category/${categoryExists.name}`
+        );
+        console.log("Updated category:", updatedCategory.data);
+      }
+
+      //verify if cuisine exists
+      const cuisineExists = cuisines.find(
+        (cuisine) => cuisine.name === recipeData.cuisine
+      );
+      if (!cuisineExists) {
+        //create the cuisine
+        const addedCuisine: Cuisine = {
+          id: "",
+          name: recipeData.cuisine,
+          recipeIds: [""],
+        };
+        const newCuisine = await axios.post(
+          `http://localhost:8090/api/cuisine`,
+          addedCuisine
+        );
+        // add recipe to cuisine
+        if (newCuisine.data) {
+          const updatedCuisine = await axios.put(
+            `http://localhost:8090/api/cuisine/${recipeData.cuisine}`
+          );
+        } else {
+          console.error("Error adding cuisine:", newCuisine);
+        }
+      } else {
+        // add recipe to cuisine
+        const updatedCuisine = await axios.put(
+          `http://localhost:8090/api/cuisine/${cuisineExists.name}`
+        );
+        console.log("Updated cuisine:", updatedCuisine.data);
+      }
     } catch (error) {
       console.error("Error adding recipe:", error);
     }
@@ -229,6 +294,18 @@ function AddRecipeModal({
     onCancel();
   };
   const handleCancelClick = () => {
+    setRecipeData({
+      id: "",
+      authorEmail: authorEmail,
+      name: "",
+      ingredients: [],
+      preparationMethod: "",
+      imageUrl: null,
+      category: "",
+      cuisine: "",
+      videoUrl: null,
+      commentId: [],
+    });
     setPreviewImage(null);
     setPreviewVideo(null);
     onCancel();
@@ -292,13 +369,13 @@ function AddRecipeModal({
             }))
           }
         >
-          {(categoryList || [])
-            .concat(inputCategoryValue || [])
-            .map((category) => (
-              <Option key={category} value={category}>
-                {category}
-              </Option>
-            ))}
+          {Array.from(
+            new Set((categoryList || []).concat(inputCategoryValue || []))
+          ).map((category) => (
+            <Option key={category} value={category}>
+              {category}
+            </Option>
+          ))}
         </Select>
         <Select
           className="input-field-category"
@@ -314,13 +391,13 @@ function AddRecipeModal({
             }))
           }
         >
-          {(cuisineList || [])
-            .concat(inputCuisineValue || [])
-            .map((cuisine) => (
-              <Option key={cuisine} value={cuisine}>
-                {cuisine}
-              </Option>
-            ))}
+          {Array.from(
+            new Set((cuisineList || []).concat(inputCuisineValue || []))
+          ).map((cuisine) => (
+            <Option key={cuisine} value={cuisine}>
+              {cuisine}
+            </Option>
+          ))}
         </Select>
         <input
           type="file"

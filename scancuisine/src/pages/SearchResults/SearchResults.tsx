@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Recipe from "../Recipe/Recipe";
-import { Input, message } from "antd";
+import { Input, message, Empty } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import axios from "axios";
 import CustomCard from "../../components/CustomCard/CustomCard";
@@ -49,14 +49,21 @@ export default function SearchResults() {
           onPressEnter={(e) => handleSearchEnter(e.currentTarget.value)}
         />
         <div className="search-recipes">
-          {recipes.map((recipe: any) => (
-            <CustomCard
-              key={recipe.id} // Assuming each recipe has a unique ID
-              id={recipe.id}
-              imageUrl={recipe.imageUrl}
-              title={recipe.name}
+          {recipes.length === 0 ? (
+            <Empty
+              className="empty-description"
+              description="No recipes found."
             />
-          ))}
+          ) : (
+            recipes.map((recipe: any) => (
+              <CustomCard
+                key={recipe.id}
+                id={recipe.id}
+                imageUrl={recipe.imageUrl}
+                title={recipe.name}
+              />
+            ))
+          )}
         </div>
       </div>
     </div>

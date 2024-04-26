@@ -30,13 +30,13 @@ public class CuisineController {
     }
 
     @GetMapping("/recipes/{cuisineName}")
-    public List<Recipe> getRecipesByCuisine(@PathVariable String cuisineName) {
+    public List<Recipe> getRecipesByCuisine(@PathVariable String cuisineName) throws ExecutionException, InterruptedException {
         return cuisineService.getRecipesByCuisine(cuisineName);
     }
 
     @PutMapping("/{name}")
-    public String updateCuisine(@PathVariable String name, @RequestBody String recipeId) {
-        return cuisineService.updateCuisine(name, recipeId);
+    public String updateCuisine(@PathVariable String name) {
+        return cuisineService.updateCuisine(name);
     }
 
     @DeleteMapping("/{name}")

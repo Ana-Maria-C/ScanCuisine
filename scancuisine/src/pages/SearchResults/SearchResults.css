@@ -23,4 +23,16 @@
   margin-top: 20px;
   flex: 1;
   gap: 20px;
+  flex-wrap: wrap;
+}
+
+.empty-description {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  text-align: center;
+  color: #6f1787;
+  margin-left: 32%;
 }
