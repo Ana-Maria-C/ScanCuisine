@@ -75,4 +75,11 @@ public class UserController {
         String result = userService.followUser(email, followerEmail);
         return ResponseEntity.ok(result);
     }
+
+    @PutMapping("/{email}/addFavoriteRecipe/{recipeId}")
+    public ResponseEntity<String> addRecipeToFavorite(@PathVariable String email, @PathVariable String recipeId) throws ExecutionException, InterruptedException {
+        String result = userService.addRecipeToFavorite(email, recipeId);
+        return ResponseEntity.ok(result);
+    }
+
 }

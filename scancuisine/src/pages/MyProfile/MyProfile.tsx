@@ -85,9 +85,8 @@ function MyProfile() {
         console.error("Error fetching profile:", (error as Error).message);
       }
     }
-
     fetchProfile();
-  }, []);
+  }, [userRecipes, userFavoriteRecipes, followedPeople]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -108,9 +107,18 @@ function MyProfile() {
     }
   };
 
+  const getUserEmail = async () => {
+    const myToken = localStorage.getItem("token");
+    const response = await axios.get(
+      `http://localhost:8090/api/users/token/${myToken}`
+    );
+    return response.data.email;
+  };
+
   const handleSave = async () => {
     try {
-      await axios.put(`http://localhost:8090/api/users/${email}`, {
+      const userEmail = await getUserEmail();
+      await axios.put(`http://localhost:8090/api/users/${userEmail}`, {
         lastName: name,
         firstName: surname,
         email: email,
@@ -121,18 +129,15 @@ function MyProfile() {
     }
   };
 
-  const handleAddRecipeClick = () => {
+  const handleAddRecipeClick = async () => {
+    const userEmail = await getUserEmail();
+    setEmail(userEmail);
     setIsAddRecipeModalOpen(true);
   };
 
   const handleRecipeAdded = async () => {
     try {
-      const myToken = localStorage.getItem("token");
-      const response = await axios.get(
-        `http://localhost:8090/api/users/token/${myToken}`
-      );
-      const userEmail = response.data.email;
-
+      const userEmail = await getUserEmail();
       const userRecipesResponse = await axios.get(
         `http://localhost:8090/api/recipes/user/${userEmail}`
       );
@@ -314,7 +319,6 @@ function MyProfile() {
         visible={isAddRecipeModalOpen}
         onCancel={() => setIsAddRecipeModalOpen(false)}
         onRecipeAdded={handleRecipeAdded}
-        authorEmail={email}
       />
     </div>
   );

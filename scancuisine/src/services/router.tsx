@@ -14,6 +14,7 @@ import MyProfile from "../pages/MyProfile/MyProfile";
 import Recipe from "../pages/Recipe/Recipe";
 import SearchResults from "../pages/SearchResults/SearchResults";
 import CategoryRecipes from "../pages/CategoryRecipes/CategoryRecipes";
+import CuisineRecipes from "../pages/CuisineRecipes/CuisineRecipes";
 
 export const router = (
   <Router>
@@ -28,6 +29,7 @@ export const router = (
       <Route path="/recipe/:id" element={<Recipe />} />
       <Route path="/search" element={<SearchResults />} />
       <Route path="/category/:categoryName" element={<CategoryRecipes />} />
+      <Route path="/cuisine/:cuisineName" element={<CuisineRecipes />} />
     </Routes>
   </Router>
 );

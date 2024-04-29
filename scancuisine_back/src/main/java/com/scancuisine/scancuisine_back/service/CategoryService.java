@@ -63,7 +63,6 @@ public class CategoryService {
         try {
             document = future.get();
             if(document.exists()){
-
                 category = document.toObject(Category.class);
                 return category;
             }
@@ -128,7 +127,7 @@ public class CategoryService {
         List<Recipe> recipes = new ArrayList<>();
         if (category != null) {
             for (Recipe recipe : recipeService.getAllRecipes()) {
-                if (recipe.getCategory().equals(categoryName)) {
+                if (recipe.getCategory().trim().equals(categoryName.trim())) {
                     recipes.add(recipe);
                 }
             }

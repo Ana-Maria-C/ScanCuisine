@@ -106,8 +106,12 @@ function Navbar() {
     }
   };
 
-  const handleMenuClick = (category: Category) => {
+  const handleMenuClickCategory = (category: Category) => {
     navigate(`/category/${category.name}`);
+  };
+
+  const handleMenuClickCuisine = (cuisine: Cuisine) => {
+    navigate(`/cuisine/${cuisine.name}`);
   };
 
   return (
@@ -135,7 +139,7 @@ function Navbar() {
         {categories.map((category) => (
           <Menu.Item
             key={category.id}
-            onClick={() => handleMenuClick(category)}
+            onClick={() => handleMenuClickCategory(category)}
             onMouseEnter={() => setIsPopupOpen(true)}
             onMouseLeave={() => setIsPopupOpen(false)}
           >
@@ -151,6 +155,7 @@ function Navbar() {
         {cuisines.map((cuisine) => (
           <Menu.Item
             key={cuisine.id}
+            onClick={() => handleMenuClickCuisine(cuisine)}
             onMouseEnter={() => setIsPopupOpen(true)}
             onMouseLeave={() => setIsPopupOpen(false)}
           >

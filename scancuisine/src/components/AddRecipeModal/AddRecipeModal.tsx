@@ -14,7 +14,6 @@ interface AddRecipeModalProps {
   visible: boolean;
   onCancel: () => void;
   onRecipeAdded: () => void;
-  authorEmail: string;
 }
 
 interface RecipeData {
@@ -46,11 +45,10 @@ function AddRecipeModal({
   visible,
   onCancel,
   onRecipeAdded,
-  authorEmail,
 }: AddRecipeModalProps) {
   const [recipeData, setRecipeData] = useState<RecipeData>({
     id: "",
-    authorEmail: authorEmail,
+    authorEmail: "",
     name: "",
     ingredients: [],
     preparationMethod: "",
@@ -193,18 +191,44 @@ function AddRecipeModal({
     }
   };
 */
-  const handleAddClick = async () => {
-    setRecipeData((prevData) => ({
-      ...prevData,
-      authorEmail: authorEmail,
-    }));
-
+  const fetchUserEmail = async () => {
     try {
+      const myToken = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8090/api/users/token/${myToken}`
+      );
+      return response.data.email;
+    } catch (error) {
+      console.error("Error fetching user email:", error);
+    }
+  };
+
+  const fetchAuthorEmail = () => {
+    return new Promise((resolve, reject) => {
+      fetchUserEmail()
+        .then((authorEmail) => {
+          setRecipeData((prevData) => {
+            const updatedData = { ...prevData, authorEmail: authorEmail };
+            resolve(updatedData);
+            return updatedData;
+          });
+        })
+        .catch((error) => {
+          console.error("Error fetching user email:", error);
+          reject(error);
+        });
+    });
+  };
+
+  const handleAddClick = async () => {
+    try {
+      // fetch author email
+      const updatedRecipeData = await fetchAuthorEmail();
       // create the recipe
-      console.log("Recipe data:", recipeData);
+      console.log("Recipe data:", updatedRecipeData);
       const addedRecipe = await axios.post(
         `http://localhost:8090/api/recipes`,
-        recipeData
+        updatedRecipeData
       );
 
       //verify if category exists
@@ -279,7 +303,7 @@ function AddRecipeModal({
     }
     setRecipeData({
       id: "",
-      authorEmail: authorEmail,
+      authorEmail: "",
       name: "",
       ingredients: [],
       preparationMethod: "",
@@ -296,7 +320,7 @@ function AddRecipeModal({
   const handleCancelClick = () => {
     setRecipeData({
       id: "",
-      authorEmail: authorEmail,
+      authorEmail: "",
       name: "",
       ingredients: [],
       preparationMethod: "",

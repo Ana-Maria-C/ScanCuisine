@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Button } from "antd";
 import { HeartOutlined, EyeOutlined } from "@ant-design/icons";
 import "./CustomCard.css";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const { Meta } = Card;
 
@@ -12,14 +13,57 @@ interface CustomCardProps {
   title: string;
 }
 
+interface Recipe {
+  id: string;
+  authorEmail: string;
+  name: string;
+  ingredients: string[];
+  preparationMethod: string;
+  imageUrl: string;
+  category: string;
+  cuisine: string;
+  videoUrl: string;
+  commentId: string[];
+}
+
 const CustomCard: React.FC<CustomCardProps> = ({ id, imageUrl, title }) => {
+  const [userFavoriteRecipes, setUserFavoriteRecipes] = useState<Recipe[]>([]);
+
+  const fetchUserData = async () => {
+    const myToken = localStorage.getItem("token");
+    const response = await axios.get(
+      `http://localhost:8090/api/users/token/${myToken}`
+    );
+    const email = response.data.email;
+    return email;
+  };
+
+  const handleAddToFavorite = async () => {
+    try {
+      // fetch user data
+      const email = await fetchUserData();
+      // add recipe to favorite
+      console.log("email:", email);
+      const response = await axios.put(
+        `http://localhost:8090/api/users/${email}/addFavoriteRecipe/${id}`
+      );
+      console.log("response:", response);
+    } catch (error) {
+      console.error("There was an error!", error);
+    }
+  };
+
   return (
     <Card
       className="custom-card"
       hoverable
       cover={<img alt="example" src={imageUrl} />}
       actions={[
-        <Button icon={<HeartOutlined />} key="favorite">
+        <Button
+          onClick={handleAddToFavorite}
+          icon={<HeartOutlined />}
+          key="favorite"
+        >
           Favorite
         </Button>,
         <Link to={`/recipe/${id}`}>

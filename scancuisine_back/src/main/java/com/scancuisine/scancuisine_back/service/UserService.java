@@ -197,4 +197,22 @@ public class UserService {
 
         return followedPeople;
     }
+
+    public String addRecipeToFavorite(String email, String recipeId) {
+        User user = getUserbyEmail(email);
+        if (user == null) {
+            return "User with email " + email + " does not exist.";
+        }
+        else{
+            List<String> userRecipeIds = user.getMyFavoriteRecipes();
+            for (String userRecipeId : userRecipeIds) {
+                if (userRecipeId.trim().equals(recipeId.trim())) {
+                    return "Recipe with id " + recipeId + " is already in the user's favorite recipes.";
+                }
+            }
+            userRecipeIds.add(recipeId);
+            user.setMyFavoriteRecipes(userRecipeIds);
+            return updateUser(email, user);
+        }
+    }
 }

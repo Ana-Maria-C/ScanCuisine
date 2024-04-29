@@ -1,34 +1,32 @@
 import React, { useEffect, useState } from "react";
 import Recipe from "../Recipe/Recipe";
-import { Input, message } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import CustomCard from "../../components/CustomCard/CustomCard";
-import "./CategoryRecipes.css";
+import "../CategoryRecipes/CategoryRecipes.css";
 
-export default function CategoryRecipes() {
-  const { categoryName } = useParams<{ categoryName: string }>();
+export default function CuisineRecipes() {
+  const { cuisineName } = useParams<{ cuisineName: string }>();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   useEffect(() => {
-    console.log("categoryName:", categoryName);
-    const fetchCategories = async () => {
+    console.log("cuisineName:", cuisineName);
+    const fetchCuisines = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8090/api/category/recipes/${categoryName}`
+          `http://localhost:8090/api/cuisine/recipes/${cuisineName}`
         );
         setRecipes(response.data);
       } catch (error) {
         console.error("There was an error!", error);
       }
     };
-    fetchCategories();
+    fetchCuisines();
     console.log("recipes", recipes);
-  }, [categoryName]);
+  }, [cuisineName]);
 
   return (
     <div className="search-results">
-      <h1>Results for category "{categoryName}"</h1>
+      <h1>Results for cuisine "{cuisineName}"</h1>
       <div className="search-results-container">
         <div className="search-recipes">
           {recipes.length > 0 ? (
@@ -42,8 +40,8 @@ export default function CategoryRecipes() {
             ))
           ) : (
             <p className="no-recipe">
-              There are no recipes yet that belong to the category "
-              {categoryName}"
+              There are no recipes yet that belong to the cuisine "{cuisineName}
+              "
             </p>
           )}
         </div>
