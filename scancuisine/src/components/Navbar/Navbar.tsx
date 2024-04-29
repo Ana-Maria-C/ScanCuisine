@@ -74,7 +74,7 @@ function Navbar() {
         console.error("Failed to fetch cuisines:", error);
         message.error("Failed to fetch cuisines. Please try again.");
       });
-  }, []);
+  }, [isPopupOpen]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");

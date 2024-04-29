@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./MyProfile.css";
 import CustomCard from "../../components/CustomCard/CustomCard";
 import UserCard from "../../components/UserCard/UserCard";
 import axios from "axios";
 import AddCard from "../../components/CustomCard/AddCard";
 import AddRecipeModal from "../../components/AddRecipeModal/AddRecipeModal";
-import { Button } from "antd";
 import { storage } from "../../firebase";
-import { ref, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import imageCompression from "browser-image-compression";
 
 interface Recipe {
   id: string;
@@ -35,6 +36,7 @@ interface FollowedPeople {
 
 function MyProfile() {
   const [name, setName] = useState("");
+  const [imageUrl, setImageUrl] = useState("my_profile.png");
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -44,6 +46,51 @@ function MyProfile() {
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [userFavoriteRecipes, setUserFavoriteRecipes] = useState<Recipe[]>([]);
   const [followedPeople, setFollowedPeople] = useState<FollowedPeople[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recipeIsLoading, setRecipeIsLoading] = useState(false);
+  const [favoriteRecipeIsLoading, setFavoriteRecipeIsLoading] = useState(false);
+  const [followedPeopleIsLoading, setFollowedPeopleIsLoading] = useState(false);
+
+  useEffect(() => {
+    async function fetchRecipes() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/recipes/user/${email}`
+        );
+        setUserRecipes(response.data);
+      } catch (error) {
+        console.error("Error fetching user recipes:", error);
+      }
+    }
+    fetchRecipes();
+  }, [recipeIsLoading]);
+
+  useEffect(() => {
+    async function fetchFavoriteRecipes() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/recipes/favorite/${email}`
+        );
+        setUserFavoriteRecipes(response.data);
+      } catch (error) {
+        console.error("Error fetching user favorite recipes:", error);
+      }
+    }
+    fetchFavoriteRecipes();
+  }, [favoriteRecipeIsLoading, userFavoriteRecipes]);
+
+  useEffect(() => {
+    async function fetchFollowedPeople() {
+      try {
+        const response = await axios.get(
+          `http://localhost:8090/api/users/followedPeople/${email}`
+        );
+        setFollowedPeople(response.data);
+      } catch (error) {
+        console.error("Error fetching followed people:", error);
+      }
+    }
+  }, [followedPeopleIsLoading]);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -66,27 +113,17 @@ function MyProfile() {
         setSurname(firstName);
         setEmail(email);
         setDescription(description);
+        setImageUrl(imageUrl);
 
-        // Fetch user recipes, favorite recipes and follwedPeople in parallel
-        const [
-          userRecipesResponse,
-          userFavoriteRecipesResponse,
-          followedPeopleResponse,
-        ] = await Promise.all([
-          axios.get(`http://localhost:8090/api/recipes/user/${email}`),
-          axios.get(`http://localhost:8090/api/recipes/favorite/${email}`),
-          axios.get(`http://localhost:8090/api/users/followedPeople/${email}`),
-        ]);
-
-        setUserRecipes(userRecipesResponse.data);
-        setUserFavoriteRecipes(userFavoriteRecipesResponse.data);
-        setFollowedPeople(followedPeopleResponse.data);
+        setRecipeIsLoading(true);
+        setFavoriteRecipeIsLoading(true);
+        setFollowedPeopleIsLoading(true);
       } catch (error) {
         console.error("Error fetching profile:", (error as Error).message);
       }
     }
     fetchProfile();
-  }, [userRecipes, userFavoriteRecipes, followedPeople]);
+  }, [userRecipes, userFavoriteRecipes, followedPeople, imageUrl]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -147,6 +184,38 @@ function MyProfile() {
     }
   };
 
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      try {
+        const options = {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 500,
+          useWebWorker: true,
+        };
+        const compressedFile = await imageCompression(file, options);
+        const imageUrl = URL.createObjectURL(compressedFile);
+
+        const imageName = `${file.name}_${uuidv4()}`;
+        const imageRef = ref(storage, `images/users/${imageName}`);
+        // Încărcați fișierul în storage
+        const snapshot = await uploadBytes(imageRef, file);
+
+        // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
+        const imageUrlDownload = await getDownloadURL(imageRef);
+
+        // Actualizați state-ul cu URL-ul de descărcare
+        setImageUrl(imageUrlDownload);
+        // Actualizați imaginea de profil a utilizatorului
+        await axios.put(`http://localhost:8090/api/users/${email}`, {
+          imageUrl: imageUrlDownload,
+        });
+      } catch (error) {
+        console.error("Error compressing image:", error);
+      }
+    }
+  };
+
   return (
     <div>
       <h1>My Profile</h1>
@@ -155,9 +224,17 @@ function MyProfile() {
           <div className="profiledetails">
             <div>
               <img
-                src="my_profile.png"
+                src={imageUrl}
                 alt="My profile"
                 className="profileimage"
+                title="Click to change profile picture"
+                onClick={() => fileInputRef.current?.click()}
+              />
+              <input
+                type="file"
+                style={{ display: "none" }}
+                ref={fileInputRef}
+                onChange={handlePhotoChange}
               />
             </div>
             <div className="description-field">
