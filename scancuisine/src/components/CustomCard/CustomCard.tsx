@@ -48,6 +48,11 @@ const CustomCard: React.FC<CustomCardProps> = ({ id, imageUrl, title }) => {
         `http://localhost:8090/api/users/${email}/addFavoriteRecipe/${id}`
       );
       console.log("response:", response);
+      // update user favorite recipes
+      const favoriteRecipesResponse = await axios.get(
+        `http://localhost:8090/api/recipes/favorite/${email}`
+      );
+      setUserFavoriteRecipes(favoriteRecipesResponse.data);
     } catch (error) {
       console.error("There was an error!", error);
     }
