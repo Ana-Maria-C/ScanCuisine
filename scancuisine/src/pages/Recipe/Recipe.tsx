@@ -28,9 +28,14 @@ interface Comment {
 }
 
 interface RecipeComments {
+  id: string;
+  recipeId: string;
+  authorEmail: string;
   authorFullName: string;
   authorImageUrl: string;
   comment: string;
+  likesCount: number;
+  dislikesCount: number;
 }
 
 function Recipe() {
@@ -57,9 +62,14 @@ function Recipe() {
 
             const fullName = `${userResponse.data.firstName} ${userResponse.data.lastName}`; // Concatenează numele și prenumele
             return {
+              id: comment.id,
+              recipeId: comment.recipeId,
               authorFullName: fullName,
+              authorEmail: comment.authorEmail,
               authorImageUrl: userResponse.data.imageUrl,
               comment: comment.comment,
+              likesCount: comment.likesCount,
+              dislikesCount: comment.dislikesCount,
             };
           } catch (error) {
             console.error("Error fetching user details:", error);
@@ -113,6 +123,50 @@ function Recipe() {
       await fetchRecipeComments();
     } catch (error) {
       console.error("Error fetching recipe comments:", error);
+    }
+  };
+
+  const handleClickLikeComment = async (comment: RecipeComments) => {
+    try {
+      comment.likesCount += 1;
+      console.log("comment data", comment);
+      const response = await axios.put(
+        `http://localhost:8090/api/recipe-comments/${comment.id}`,
+        {
+          id: comment.id,
+          recipeId: comment.recipeId,
+          authorEmail: comment.authorEmail,
+          comment: comment.comment,
+          likesCount: comment.likesCount,
+          dislikesCount: comment.dislikesCount,
+        }
+      );
+      // refresh comments
+      await fetchRecipeComments();
+    } catch (error) {
+      console.error("Error liking comment:", error);
+    }
+  };
+
+  const handleClickDislikeComment = async (comment: RecipeComments) => {
+    try {
+      comment.dislikesCount += 1;
+      console.log("comment data", comment);
+      const response = await axios.put(
+        `http://localhost:8090/api/recipe-comments/${comment.id}`,
+        {
+          id: comment.id,
+          recipeId: comment.recipeId,
+          authorEmail: comment.authorEmail,
+          comment: comment.comment,
+          likesCount: comment.likesCount,
+          dislikesCount: comment.dislikesCount,
+        }
+      );
+      // refresh comments
+      await fetchRecipeComments();
+    } catch (error) {
+      console.error("Error liking comment:", error);
     }
   };
   return (
@@ -229,12 +283,22 @@ function Recipe() {
                 <p className="comment">{comment.comment}</p>
               </div>
               <div className="like-buttons">
-                <Button>
-                  <LikeOutlined />
-                </Button>
-                <Button>
-                  <DislikeOutlined />
-                </Button>
+                <div className="like_">
+                  {comment.likesCount + comment.dislikesCount !== 0 && (
+                    <p className="like_counts">{comment.likesCount}</p>
+                  )}
+                  <Button onClick={() => handleClickLikeComment(comment)}>
+                    <LikeOutlined />
+                  </Button>
+                </div>
+                <div className="like_">
+                  {comment.dislikesCount + comment.likesCount !== 0 && (
+                    <p className="like_counts">{comment.dislikesCount}</p>
+                  )}
+                  <Button onClick={() => handleClickDislikeComment(comment)}>
+                    <DislikeOutlined />
+                  </Button>
+                </div>
               </div>
             </div>
           ))

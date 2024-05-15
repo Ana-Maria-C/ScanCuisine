@@ -113,7 +113,11 @@ function MyProfile() {
         setSurname(firstName);
         setEmail(email);
         setDescription(description);
-        setImageUrl(imageUrl);
+        if (imageUrl !== null && imageUrl !== "") {
+          setImageUrl(imageUrl);
+        } else {
+          setImageUrl("my_profile.png");
+        }
 
         setRecipeIsLoading(true);
         setFavoriteRecipeIsLoading(true);
@@ -167,6 +171,7 @@ function MyProfile() {
   };
 
   const handleAddRecipeClick = async () => {
+    console.log("se deschide modalul");
     const userEmail = await getUserEmail();
     setEmail(userEmail);
     setIsAddRecipeModalOpen(true);
