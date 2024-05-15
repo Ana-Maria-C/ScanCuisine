@@ -1,5 +1,6 @@
 package com.scancuisine.scancuisine_back.entity.user;
 
+import com.google.firebase.database.PropertyName;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
@@ -19,6 +20,7 @@ public class User implements UserDetails {
     private String firstName;
     private String lastName;
     private String description;
+    @PropertyName("username")
     private String email;
     private String password;
     private String imageUrl;
@@ -88,5 +90,6 @@ public class User implements UserDetails {
             followedPeople.add(person);
         }
     }
+
 
 }

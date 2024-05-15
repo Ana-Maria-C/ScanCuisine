@@ -57,6 +57,7 @@ public class RecipeService {
             if(recipe.getCommentId().isEmpty()){
                 recipe.setCommentId(new ArrayList<>());
             }
+            recipe.setLikes(0);
             user.getMyRecipes().add(recipe.getId());
             this.userService.updateUser(recipe.getAuthorEmail(), user);
             ApiFuture<WriteResult> collectionsApiFuture = recipesCollection.document(recipe.getId()).set(recipe);
@@ -159,6 +160,9 @@ public class RecipeService {
                 }
                 if(recipe.getCommentId().size()==1 && recipe.getCommentId().get(0).equals("string")){
                     recipe.setCommentId(getRecipebyId(id).getCommentId());
+                }
+                if (recipe.getLikes()==0){
+                    recipe.setLikes(getRecipebyId(id).getLikes());
                 }
                 ApiFuture<WriteResult> writeResultApiFuture = documentReference.set(recipe);
                 return writeResultApiFuture.get().getUpdateTime().toString();

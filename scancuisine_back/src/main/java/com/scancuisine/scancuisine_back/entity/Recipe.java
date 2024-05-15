@@ -18,6 +18,8 @@ public class Recipe {
     private String videoUrl;
     private List<String> commentId;
 
+    private int likes;
+
     public void setId() {
         this.id = UUID.randomUUID().toString();
     }

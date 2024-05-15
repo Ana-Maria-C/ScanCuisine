@@ -63,7 +63,7 @@ function MyProfile() {
       }
     }
     fetchRecipes();
-  }, [recipeIsLoading]);
+  }, [email, recipeIsLoading]);
 
   useEffect(() => {
     async function fetchFavoriteRecipes() {
@@ -77,7 +77,7 @@ function MyProfile() {
       }
     }
     fetchFavoriteRecipes();
-  }, [favoriteRecipeIsLoading, userFavoriteRecipes]);
+  }, [email, favoriteRecipeIsLoading]);
 
   useEffect(() => {
     async function fetchFollowedPeople() {
@@ -90,7 +90,7 @@ function MyProfile() {
         console.error("Error fetching followed people:", error);
       }
     }
-  }, [followedPeopleIsLoading]);
+  }, [email, followedPeopleIsLoading]);
 
   useEffect(() => {
     async function fetchProfile() {
@@ -118,16 +118,15 @@ function MyProfile() {
         } else {
           setImageUrl("my_profile.png");
         }
-
-        setRecipeIsLoading(true);
-        setFavoriteRecipeIsLoading(true);
-        setFollowedPeopleIsLoading(true);
       } catch (error) {
         console.error("Error fetching profile:", (error as Error).message);
       }
     }
     fetchProfile();
-  }, [userRecipes, userFavoriteRecipes, followedPeople, imageUrl]);
+    setFavoriteRecipeIsLoading(!favoriteRecipeIsLoading);
+    setRecipeIsLoading(!recipeIsLoading);
+    setFollowedPeopleIsLoading(!followedPeopleIsLoading);
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
