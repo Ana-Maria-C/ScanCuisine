@@ -7,6 +7,7 @@ import axios from "axios";
 import AddCommentModal from "../../components/AddCommentModal/AddCommentModal";
 import { EditOutlined } from "@ant-design/icons";
 import { Dropdown, Menu, Space } from "antd";
+import { get } from "http";
 
 interface Recipe {
   id: string;
@@ -40,6 +41,26 @@ interface RecipeComments {
   dislikesCount: number;
 }
 
+interface Nutrition {
+  calories: { key: number; value: string };
+  fat: { key: number; value: string };
+  protein: { key: number; value: string };
+  carbs: { key: number; value: string };
+}
+
+interface TableRowProps {
+  name: string;
+  nutrient: { key: number; value: string }; // Define the type for the nutrient prop
+}
+
+const TableRow: React.FC<TableRowProps> = ({ name, nutrient }) => (
+  <tr>
+    <td>{name}</td>
+    <td>{nutrient.key}</td>
+    <td>{nutrient.value}</td>
+  </tr>
+);
+
 function Recipe() {
   const { id } = useParams<{ id: string }>();
   const [recipe, setRecipe] = useState<Recipe>();
@@ -48,6 +69,7 @@ function Recipe() {
   const [recipeComments, setRecipeComments] = useState<RecipeComments[]>([]);
   const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
   const [substitute, setSubstitute] = useState<string[] | null>(null);
+  const [nutrition, setNutrition] = useState<Nutrition | null>(null);
 
   const fetchRecipeComments = async () => {
     try {
@@ -105,7 +127,6 @@ function Recipe() {
     };
 
     try {
-      console.log("ingredient:", ingredient);
       const response = await axios.request(options);
       console.log("response", response.data);
       if (response.data.status === "success") {
@@ -113,10 +134,30 @@ function Recipe() {
       } else {
         setSubstitute(["No substitute found"]);
       }
-      console.log("substitute:", substitute);
     } catch (error) {
       console.error(error);
       setSubstitute(["Error fetching substitute"]);
+    }
+  };
+
+  const getNutrition = async (title: string) => {
+    const options = {
+      method: "GET",
+      url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/guessNutrition",
+      params: { title: "chocolate cake" },
+      headers: {
+        "X-RapidAPI-Key": "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
+    };
+
+    try {
+      const response = await axios.request(options);
+      console.log(response.data);
+      return response.data;
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -140,6 +181,31 @@ function Recipe() {
         );
         setRecipe(response.data);
         setLoading(false);
+
+        if (response.data) {
+          const result = await getNutrition(response.data.name);
+          console.log("result", result);
+          // set the nutrition data
+          setNutrition(() => ({
+            calories: {
+              key: result.calories.value,
+              value: result.calories.unit,
+            },
+            fat: {
+              key: result.fat.value,
+              value: result.fat.unit,
+            },
+            protein: {
+              key: result.protein.value,
+              value: result.protein.unit,
+            },
+            carbs: {
+              key: result.carbs.value,
+              value: result.carbs.unit,
+            },
+          }));
+          console.log("nutrition", nutrition);
+        }
       } catch (error) {
         console.error("Error fetching recipe:", error);
         setLoading(false);
@@ -259,11 +325,29 @@ function Recipe() {
           </video>
         </div>
       </div>
-      {/*
+
       <div className="recipe-calorie">
-        <h2 className="sub-title">Calculator calorii </h2>
+        <h2 className="sub-title">Nutrition </h2>
+        <table className="recipe-table">
+          <thead>
+            <tr>
+              <th>Nutrient</th>
+              <th>Value</th>
+              <th>Unit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {nutrition && (
+              <>
+                <TableRow name="Calories" nutrient={nutrition.calories} />
+                <TableRow name="Fat" nutrient={nutrition.fat} />
+                <TableRow name="Protein" nutrient={nutrition.protein} />
+                <TableRow name="Carbs" nutrient={nutrition.carbs} />
+              </>
+            )}
+          </tbody>
+        </table>
       </div>
-  */}
       <div className="recipe-comments">
         <h2 className="sub-title"> Comments </h2>
         {/*<div className="comments-container">

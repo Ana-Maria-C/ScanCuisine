@@ -46,11 +46,14 @@ function MyProfile() {
   const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [userFavoriteRecipes, setUserFavoriteRecipes] = useState<Recipe[]>([]);
-  const [followedPeople, setFollowedPeople] = useState<FollowedPeople[]>([]);
+  //const [followedPeople, setFollowedPeople] = useState<FollowedPeople[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [recipeIsLoading, setRecipeIsLoading] = useState(false);
   const [favoriteRecipeIsLoading, setFavoriteRecipeIsLoading] = useState(false);
-  const [followedPeopleIsLoading, setFollowedPeopleIsLoading] = useState(false);
+  //const [followedPeopleIsLoading, setFollowedPeopleIsLoading] = useState(false);
+  // variable to store the recommended recipes
+  const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<string[]>([]);
+  const [recommendedRecipes, setRecommendedRecipes] = useState<Recipe[]>([]);
 
   useEffect(() => {
     async function fetchRecipes() {
@@ -80,7 +83,7 @@ function MyProfile() {
     fetchFavoriteRecipes();
   }, [email, favoriteRecipeIsLoading]);
 
-  useEffect(() => {
+  /*useEffect(() => {
     async function fetchFollowedPeople() {
       try {
         const response = await axios.get(
@@ -92,6 +95,7 @@ function MyProfile() {
       }
     }
   }, [email, followedPeopleIsLoading]);
+  */
 
   useEffect(() => {
     async function fetchProfile() {
@@ -123,11 +127,96 @@ function MyProfile() {
         console.error("Error fetching profile:", (error as Error).message);
       }
     }
+
     fetchProfile();
     setFavoriteRecipeIsLoading(!favoriteRecipeIsLoading);
     setRecipeIsLoading(!recipeIsLoading);
-    setFollowedPeopleIsLoading(!followedPeopleIsLoading);
+    // setFollowedPeopleIsLoading(!followedPeopleIsLoading);
   }, []);
+
+  useEffect(() => {
+    async function getRecommendedRecipes() {
+      let recommendedRecipeUrls = [];
+
+      try {
+        let firstFiveRecipes = userFavoriteRecipes.slice(0, 5);
+        let uniqueIds = new Set(favoriteRecipeIds);
+        for (let recipe of firstFiveRecipes) {
+          // extract id from extern api
+          const options = {
+            method: "GET",
+            url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch",
+            params: { query: "pasta" },
+            headers: {
+              "X-RapidAPI-Key":
+                "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+              "X-RapidAPI-Host":
+                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+            },
+          };
+          const response = await axios.request(options);
+          if (response.data.results) {
+            uniqueIds.add(response.data.results[0]["id"]);
+          }
+        }
+        setFavoriteRecipeIds(Array.from(uniqueIds));
+        console.log("Favorite recipe ids:", favoriteRecipeIds);
+      } catch (error) {
+        console.error("Error getting the id for my favorite recipes:", error);
+      }
+
+      // get the recommended recipes based on the ids
+      try {
+        for (let id of favoriteRecipeIds) {
+          const options = {
+            method: "GET",
+            url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${id}/similar`,
+            headers: {
+              "X-RapidAPI-Key":
+                "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+              "X-RapidAPI-Host":
+                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+            },
+          };
+          const response = await axios.request(options);
+          if (response.data) {
+            const firstTwoRecommendedRecipe = response.data.slice(0, 2);
+            for (let recipe of firstTwoRecommendedRecipe) {
+              recommendedRecipeUrls.push(recipe.sourceUrl);
+            }
+          }
+        }
+        console.log("Recommended recipe urls:", recommendedRecipeUrls);
+      } catch (error) {
+        console.error("Error getting the recommended recipes:", error);
+      }
+
+      // extract the recommended recipes from the urls
+      try {
+        for (let url of recommendedRecipeUrls) {
+          const options = {
+            method: "GET",
+            url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/extract",
+            params: {
+              url: url,
+            },
+            headers: {
+              "X-RapidAPI-Key":
+                "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+              "X-RapidAPI-Host":
+                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+            },
+          };
+
+          const response = await axios.request(options);
+          console.log("Recommended recipe from website:", response.data);
+        }
+      } catch (error) {
+        console.error("Error extracting the recommended recipes:", error);
+      }
+    }
+    getRecommendedRecipes();
+  }, [email]);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -329,11 +418,6 @@ function MyProfile() {
         <div className="myrecipes">
           <h2>My Recipes</h2>
           <div className="myrecipes-container">
-            {/*} <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
-            <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
-            <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />*/}
-            {/* Display user's recipes */}
             {userRecipes.length > 0 &&
               userRecipes.map((recipe) => (
                 <CustomCard
@@ -351,12 +435,6 @@ function MyProfile() {
         <div className="myfavorites">
           <h2>My Favorite Recipes</h2>
           <div className="myrecipes-container">
-            {/*<CustomCard imageUrl="./mancare1.jpg" title="Soup" />
-            <CustomCard imageUrl="./mancare2.jpg" title="Lasagna" />
-            <CustomCard imageUrl="./mancare3.jpg" title="Pasta" />
-            <CustomCard imageUrl="./prajitura1.jpg" title="Lava Cake" />
-            <CustomCard imageUrl="./prajitura2.jpg" title="Berry Cake" />*/}
-            {/* Display user's favorite recipes */}
             {userFavoriteRecipes.length > 0 ? (
               userFavoriteRecipes.map((recipe) => (
                 <CustomCard
@@ -373,6 +451,7 @@ function MyProfile() {
             )}
           </div>
         </div>
+        {/*}
         <div className="following">
           <h2>People I follow</h2>
           <div className="following-container">
@@ -380,7 +459,7 @@ function MyProfile() {
             <UserCard imageUrl="./boyuser1.png" title="Burada Alex" />
             <UserCard imageUrl="./boyuser2.png" title="Popescu Ioan" />
             <UserCard imageUrl="./girluser1.png" title="Catavencu Gabriela" />
-            <UserCard imageUrl="./girluser2.jpg" title="Chirica Alexia" />*/}
+            <UserCard imageUrl="./girluser2.jpg" title="Chirica Alexia" />*}
             {followedPeople.length > 0 ? (
               followedPeople.map((person) => (
                 <UserCard
@@ -395,6 +474,10 @@ function MyProfile() {
               </div>
             )}
           </div>
+        </div>
+        */}
+        <div className="following">
+          <h2>Recommended for you</h2>
         </div>
       </div>
       <AddRecipeModal

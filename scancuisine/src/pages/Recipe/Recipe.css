@@ -216,6 +216,35 @@
   color: #590865;
 }
 
+.recipe-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  width: 80%;
+  margin-left: 10%;
+  color: #590865;
+}
+
+.recipe-table th,
+.recipe-table td {
+  padding: 10px;
+  border: 1px solid #dddddd;
+  text-align: left;
+}
+
+.recipe-table th {
+  background-color: #e489ec;
+  font-weight: bold;
+}
+
+.recipe-table tr:nth-child(even) {
+  background-color: #f4dcf6;
+}
+
+.recipe-table tr:hover {
+  background-color: #e489ec;
+}
+
 @media screen and (max-width: 1024px) {
   .recipe-container {
     align-items: center;
