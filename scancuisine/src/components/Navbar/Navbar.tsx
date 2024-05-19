@@ -89,7 +89,7 @@ function Navbar() {
     if (e.key === "Enter") {
       const inputElement = e.target as HTMLInputElement;
       const recipeName = inputElement.value.trim();
-      //console.log("Text introdus în căutare:", recipeName);
+      //console.log("Text introdus în cautare:", recipeName);
       if (recipeName.length > 0) {
         try {
           localStorage.setItem("searchQuery", recipeName);

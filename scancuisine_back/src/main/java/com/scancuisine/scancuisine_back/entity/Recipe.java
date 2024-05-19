@@ -2,6 +2,7 @@ package com.scancuisine.scancuisine_back.entity;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,8 +18,8 @@ public class Recipe {
     private String cuisine;
     private String videoUrl;
     private List<String> commentId;
-
     private int likes;
+    private Date datePosted;
 
     public void setId() {
         this.id = UUID.randomUUID().toString();

@@ -21,6 +21,7 @@ interface Recipe {
   cuisine: string;
   videoUrl: string;
   commentId: string[];
+  likes: number;
 }
 
 interface FollowedPeople {

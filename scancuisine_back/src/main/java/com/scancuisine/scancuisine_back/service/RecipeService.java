@@ -9,8 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeService {
@@ -58,6 +60,7 @@ public class RecipeService {
                 recipe.setCommentId(new ArrayList<>());
             }
             recipe.setLikes(0);
+            recipe.setDatePosted(new Date());
             user.getMyRecipes().add(recipe.getId());
             this.userService.updateUser(recipe.getAuthorEmail(), user);
             ApiFuture<WriteResult> collectionsApiFuture = recipesCollection.document(recipe.getId()).set(recipe);
@@ -164,6 +167,7 @@ public class RecipeService {
                 if (recipe.getLikes()==0){
                     recipe.setLikes(getRecipebyId(id).getLikes());
                 }
+                recipe.setDatePosted(getRecipebyId(id).getDatePosted());
                 ApiFuture<WriteResult> writeResultApiFuture = documentReference.set(recipe);
                 return writeResultApiFuture.get().getUpdateTime().toString();
             } else {
@@ -238,6 +242,41 @@ public class RecipeService {
             if(recipe.getName().toLowerCase().contains(name.toLowerCase())){
                 recipes.add(recipe);
             }
+        }
+        return recipes;
+    }
+
+    public String likeRecipe(String id) {
+        Recipe recipe = this.getRecipebyId(id);
+        if (recipe == null) {
+            return "Recipe with id " + id + " does not exist.";
+        }
+        else{
+            recipe.setLikes(recipe.getLikes()+1);
+            return this.updateRecipe(id, recipe);
+        }
+    }
+
+    public List<Recipe> getMostLikedRecipes() {
+        List<Recipe> recipes = new ArrayList<>();
+        try {
+            recipes = this.getAllRecipes();
+            recipes.sort((r1, r2) -> Integer.compare(r2.getLikes(), r1.getLikes()));
+            return recipes.stream().limit(5).collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return recipes;
+    }
+
+    public List<Recipe> getLatestRecipe() {
+        List<Recipe> recipes = new ArrayList<>();
+        try {
+            recipes = this.getAllRecipes();
+            recipes.sort((r1, r2) -> r2.getDatePosted().compareTo(r1.getDatePosted()));
+            return recipes.stream().limit(5).collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return recipes;
     }

@@ -5,6 +5,8 @@ import { Button } from "antd";
 import { LikeOutlined, DislikeOutlined } from "@ant-design/icons";
 import axios from "axios";
 import AddCommentModal from "../../components/AddCommentModal/AddCommentModal";
+import { EditOutlined } from "@ant-design/icons";
+import { Dropdown, Menu, Space } from "antd";
 
 interface Recipe {
   id: string;
@@ -45,6 +47,7 @@ function Recipe() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [recipeComments, setRecipeComments] = useState<RecipeComments[]>([]);
   const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
+  const [substitute, setSubstitute] = useState<string[] | null>(null);
 
   const fetchRecipeComments = async () => {
     try {
@@ -86,6 +89,48 @@ function Recipe() {
       console.error("Error fetching recipe comments:", error);
     }
   };
+
+  const fetchIngredientSubstitute = async (ingredient: string) => {
+    const options = {
+      method: "GET",
+      url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/food/ingredients/substitutes",
+      params: {
+        ingredientName: ingredient,
+      },
+      headers: {
+        "X-RapidAPI-Key": "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+        "X-RapidAPI-Host":
+          "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+      },
+    };
+
+    try {
+      console.log("ingredient:", ingredient);
+      const response = await axios.request(options);
+      console.log("response", response.data);
+      if (response.data.status === "success") {
+        setSubstitute(response.data.substitutes || ["No substitute found"]);
+      } else {
+        setSubstitute(["No substitute found"]);
+      }
+      console.log("substitute:", substitute);
+    } catch (error) {
+      console.error(error);
+      setSubstitute(["Error fetching substitute"]);
+    }
+  };
+
+  const getMenuItems = () => {
+    if (!substitute) {
+      return [];
+    }
+    return substitute.map((item, index) => ({
+      label: item,
+      key: index.toString(),
+    }));
+  };
+
+  const menu = <Menu className="drop-down-menu" items={getMenuItems()} />;
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -181,7 +226,20 @@ function Recipe() {
           <div className="recipe-ingredients-container">
             <ul>
               {recipe.ingredients.map((ingredient, index) => (
-                <li key={index}>{ingredient}</li>
+                <li key={index}>
+                  {ingredient}
+                  <Dropdown overlay={menu} trigger={["click"]}>
+                    <a onClick={(e) => e.preventDefault()}>
+                      <Space>
+                        <EditOutlined
+                          onClick={() => fetchIngredientSubstitute(ingredient)}
+                          title="Get Substitute"
+                          className="substitute-recipe-icon"
+                        />
+                      </Space>
+                    </a>
+                  </Dropdown>
+                </li>
               ))}
             </ul>
           </div>

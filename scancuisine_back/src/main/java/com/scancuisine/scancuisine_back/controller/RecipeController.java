@@ -50,9 +50,24 @@ public class RecipeController {
         return recipeService.updateRecipe(id, recipe);
     }
 
+    @PutMapping("/like/{id}")
+    public String likeRecipe(@PathVariable String id) throws ExecutionException, InterruptedException {
+        return recipeService.likeRecipe(id);
+    }
+
     @DeleteMapping("/{id}")
     public String deleteRecipe(@PathVariable String id) throws ExecutionException, InterruptedException {
         return recipeService.deleteRecipe(id);
+    }
+
+    @GetMapping("/mostLiked")
+    public List<Recipe> getMostLikedRecipes() throws ExecutionException, InterruptedException {
+        return recipeService.getMostLikedRecipes();
+    }
+
+    @GetMapping("/latestRecipe")
+    public List<Recipe> getLatestRecipe() throws ExecutionException, InterruptedException {
+        return recipeService.getLatestRecipe();
     }
 
 }
