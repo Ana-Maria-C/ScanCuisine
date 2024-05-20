@@ -32,6 +32,16 @@
   justify-content: center;
 }
 
+.sub-title-ingredients {
+  font-size: 2rem;
+  color: #e489ec;
+  font-style: oblique;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  margin-top: -7px;
+}
+
 .recipe-image {
   display: flex;
   height: auto;
@@ -62,11 +72,11 @@
 }
 
 .recipe-ingredients-container {
-  margin-top: -20px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow-y: auto;
+  margin-bottom: -10px;
 }
 
 .recipe-ingredients-container::-webkit-scrollbar {

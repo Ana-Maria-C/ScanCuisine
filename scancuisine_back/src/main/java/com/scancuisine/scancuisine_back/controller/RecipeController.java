@@ -70,4 +70,8 @@ public class RecipeController {
         return recipeService.getLatestRecipe();
     }
 
+    @GetMapping("/userRecommendationRecipe/{email}")
+    public List<Recipe> getUserRecommendationRecipe(@PathVariable String email) throws ExecutionException, InterruptedException {
+        return recipeService.getUserRecommendationRecipe(email);
+    }
 }

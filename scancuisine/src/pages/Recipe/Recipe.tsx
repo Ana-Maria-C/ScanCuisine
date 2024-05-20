@@ -70,6 +70,7 @@ function Recipe() {
   const [isAddCommentModalOpen, setIsAddCommentModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
   const [substitute, setSubstitute] = useState<string[] | null>(null);
   const [nutrition, setNutrition] = useState<Nutrition | null>(null);
+  const XRapidAPIKey = "75af58f578msh272dfd8ac1822c4p150537jsn4d64d2cb298b";
 
   const fetchRecipeComments = async () => {
     try {
@@ -120,7 +121,7 @@ function Recipe() {
         ingredientName: ingredient,
       },
       headers: {
-        "X-RapidAPI-Key": "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+        "X-RapidAPI-Key": XRapidAPIKey,
         "X-RapidAPI-Host":
           "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
       },
@@ -144,9 +145,9 @@ function Recipe() {
     const options = {
       method: "GET",
       url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/guessNutrition",
-      params: { title: "chocolate cake" },
+      params: { title: title },
       headers: {
-        "X-RapidAPI-Key": "cc52b34b8dmshc6a5492c010552dp10ddd2jsnbde45ea4a632",
+        "X-RapidAPI-Key": XRapidAPIKey,
         "X-RapidAPI-Host":
           "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
       },
@@ -186,25 +187,34 @@ function Recipe() {
           const result = await getNutrition(response.data.name);
           console.log("result", result);
           // set the nutrition data
-          setNutrition(() => ({
-            calories: {
-              key: result.calories.value,
-              value: result.calories.unit,
-            },
-            fat: {
-              key: result.fat.value,
-              value: result.fat.unit,
-            },
-            protein: {
-              key: result.protein.value,
-              value: result.protein.unit,
-            },
-            carbs: {
-              key: result.carbs.value,
-              value: result.carbs.unit,
-            },
-          }));
-          console.log("nutrition", nutrition);
+          if (
+            !(
+              result.calories === undefined ||
+              result.fat === undefined ||
+              result.protein === undefined ||
+              result.carbs === undefined
+            )
+          ) {
+            setNutrition(() => ({
+              calories: {
+                key: result.calories.value,
+                value: result.calories.unit,
+              },
+              fat: {
+                key: result.fat.value,
+                value: result.fat.unit,
+              },
+              protein: {
+                key: result.protein.value,
+                value: result.protein.unit,
+              },
+              carbs: {
+                key: result.carbs.value,
+                value: result.carbs.unit,
+              },
+            }));
+            console.log("nutrition", nutrition);
+          }
         }
       } catch (error) {
         console.error("Error fetching recipe:", error);
@@ -288,7 +298,7 @@ function Recipe() {
           <img src={recipe.imageUrl} className="recipe-image" alt="recipe" />
         </div>
         <div className="recipe-ingredients">
-          <h2 className="sub-title">Ingredients</h2>
+          <h2 className="sub-title-ingredients">Ingredients</h2>
           <div className="recipe-ingredients-container">
             <ul>
               {recipe.ingredients.map((ingredient, index) => (
@@ -325,29 +335,30 @@ function Recipe() {
           </video>
         </div>
       </div>
-
-      <div className="recipe-calorie">
-        <h2 className="sub-title">Nutrition </h2>
-        <table className="recipe-table">
-          <thead>
-            <tr>
-              <th>Nutrient</th>
-              <th>Value</th>
-              <th>Unit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {nutrition && (
-              <>
-                <TableRow name="Calories" nutrient={nutrition.calories} />
-                <TableRow name="Fat" nutrient={nutrition.fat} />
-                <TableRow name="Protein" nutrient={nutrition.protein} />
-                <TableRow name="Carbs" nutrient={nutrition.carbs} />
-              </>
-            )}
-          </tbody>
-        </table>
-      </div>
+      {nutrition && (
+        <div className="recipe-calorie">
+          <h2 className="sub-title">Nutrition </h2>
+          <table className="recipe-table">
+            <thead>
+              <tr>
+                <th>Nutrient</th>
+                <th>Value</th>
+                <th>Unit</th>
+              </tr>
+            </thead>
+            <tbody>
+              {nutrition && (
+                <>
+                  <TableRow name="Calories" nutrient={nutrition.calories} />
+                  <TableRow name="Fat" nutrient={nutrition.fat} />
+                  <TableRow name="Protein" nutrient={nutrition.protein} />
+                  <TableRow name="Carbs" nutrient={nutrition.carbs} />
+                </>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
       <div className="recipe-comments">
         <h2 className="sub-title"> Comments </h2>
         {/*<div className="comments-container">

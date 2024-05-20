@@ -111,7 +111,6 @@ public class UserService {
                 if (user.getRole() != null) {
                     updates.put("role", user.getRole());
                 }
-
                 ApiFuture<WriteResult> writeResultApiFuture = documentReference.update(updates);
                 return writeResultApiFuture.get().getUpdateTime().toString();
             } else {

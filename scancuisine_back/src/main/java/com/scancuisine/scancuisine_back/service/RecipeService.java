@@ -27,7 +27,10 @@ public class RecipeService {
         Query query = dbFirestore.collection(COLLECTION_NAME).whereEqualTo("id", recipe.getId());
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = query.get();
         QuerySnapshot querySnapshot = querySnapshotApiFuture.get();
-
+        List<Recipe> recipesFromDB = getAllRecipes();
+        if(recipesFromDB.stream().anyMatch(r -> r.getName().equals(recipe.getName())) && recipesFromDB.stream().anyMatch(r -> r.getIngredients().equals(recipe.getIngredients()))){
+            return "Recipe " + recipe.getName() + " already exists.";
+        }
         if (querySnapshot.isEmpty()) {
             recipe.setId();
             User user = this.userService.getUserbyEmail(recipe.getAuthorEmail());
@@ -80,7 +83,11 @@ public class RecipeService {
         List<Recipe> recipeList = new ArrayList<>();
         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
             Recipe recipe = document.toObject(Recipe.class);
-            recipeList.add(recipe);
+            assert recipe != null;
+            if(recipe.getCategory().indexOf('@') == -1)
+            {
+                recipeList.add(recipe);
+            }
         }
 
         return recipeList;
@@ -275,6 +282,25 @@ public class RecipeService {
             recipes = this.getAllRecipes();
             recipes.sort((r1, r2) -> r2.getDatePosted().compareTo(r1.getDatePosted()));
             return recipes.stream().limit(5).collect(Collectors.toList());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return recipes;
+    }
+
+    public List<Recipe> getUserRecommendationRecipe(String email) {
+        List<Recipe> recipes = new ArrayList<>();
+        try {
+            User user = this.userService.getUserbyEmail(email);
+            if (user == null) {
+                return new ArrayList<>();
+            }
+            for (Recipe recipe : this.getRecipesOfUser("recomendedrecipes@gmail.com")) {
+                if(recipe.getCategory().equals(email)){
+                    recipes.add(recipe);
+                }
+            }
+            return recipes;
         } catch (Exception e) {
             e.printStackTrace();
         }
