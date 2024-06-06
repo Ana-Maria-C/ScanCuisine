@@ -42,3 +42,55 @@
 .navbar .camera-scan {
   margin-left: 40%;
 }
+
+/* camera*/
+/* Stil pentru modal */
+
+.camera-modal {
+  margin-top: -80px;
+  height: 600px !important;
+  width: 850px !important;
+}
+
+.camera-modal-video {
+  width: 100%;
+  height: 600px;
+}
+
+.camera-modal .ant-modal-title {
+  color: #8e24aa;
+  font-size: 20px;
+  background-color: #f4dcf6;
+}
+
+.camera-modal-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f0f0f0; /* Optional: Add a background color to the footer */
+}
+
+.camera-modal .ant-modal-content {
+  background-color: #f4dcf6; /* Optional: Add a background color to the footer */
+}
+
+.camera-modal-button {
+  height: 50px;
+  width: 50px;
+  background-color: #fce4ec;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: -150px;
+}
+
+.camera-modal-action-button {
+  height: 40px;
+  width: 40px;
+  background-color: #8e24aa;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  margin-top: -150px;
+  margin-left: -45px;
+}
