@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Menu, Button, Input, message, Modal } from "antd";
 import { Link } from "react-router-dom";
 import {
   UserOutlined,
   SearchOutlined,
   CameraOutlined,
-  ChromeOutlined,
 } from "@ant-design/icons";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { v4 as uuidv4 } from "uuid";
+import { storage } from "../../firebase";
 
 const { SubMenu } = Menu;
 
@@ -35,6 +37,11 @@ function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [cuisines, setCuisines] = useState<Cuisine[]>([]);
   const [cameraVisible, setCameraVisible] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [imageUrl, setImageUrl] = useState<string>("");
+
+  const [modalContent, setModalContent] = useState<React.ReactNode>(null);
+  const [title, setTitle] = useState<string>("Scan your fridge...");
 
   const navigate = useNavigate();
 
@@ -123,9 +130,9 @@ function Navbar() {
   const closeCamera = () => {
     setCameraVisible(false);
     let video = document.querySelector("video");
-    if (video && video.srcObject) {
-      let stream = video.srcObject as MediaStream;
-      let tracks = stream.getTracks();
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      const tracks = stream.getTracks();
       tracks.forEach((track) => track.stop());
     }
   };
@@ -135,10 +142,9 @@ function Navbar() {
       navigator.mediaDevices
         .getUserMedia({ video: true })
         .then((stream) => {
-          let video = document.querySelector("video");
-          if (video) {
-            video.srcObject = stream;
-            video.play();
+          if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            videoRef.current.play();
           }
         })
         .catch((error) => {
@@ -147,6 +153,57 @@ function Navbar() {
         });
     }
   }, [cameraVisible]);
+
+  const captureImage = async () => {
+    if (videoRef.current) {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            await uploadToStorage(blob);
+            // Închideți camera după încărcarea imaginii
+            closeCamera();
+            // Setează conținutul modalului cu un video de la o adresă URL specificată
+            setTitle("Searching for recipes...");
+            setModalContent(
+              <img
+                className="camera-modal-image"
+                src="https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/gif%2Fsearch_recipe_gif_123456789.gif?alt=media&token=641005bd-0ddf-4720-a79d-d5e672e49d20"
+                alt="Recipe GIF"
+              />
+            );
+          }
+        }, "image/jpeg");
+      }
+    }
+  };
+
+  const uploadToStorage = async (blob: Blob) => {
+    const formData = new FormData();
+    // generate a unique image name
+    const imageName = `$image_${uuidv4()}`;
+    formData.append("file", blob, imageName);
+    console.log("formData", formData.values);
+    try {
+      // Crearea unei referințe de stocare
+      const imageRef = ref(storage, `scanImages/${imageName}`);
+      // Încărcați fișierul în storage
+      const snapshot = await uploadBytes(imageRef, blob);
+
+      // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
+      const imageUrlDownload = await getDownloadURL(imageRef);
+
+      console.log("image url", imageUrlDownload);
+      /* message.success("Image uploaded successfully!");*/
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      message.error("Failed to upload image. Please try again.");
+    }
+  };
 
   return (
     <>
@@ -223,16 +280,30 @@ function Navbar() {
       </Menu>
       <Modal
         className="camera-modal"
-        title="Scan your fridge..."
-        visible={cameraVisible}
-        onCancel={closeCamera}
+        title={title}
+        visible={cameraVisible || modalContent !== null}
+        onCancel={() => {
+          setCameraVisible(false);
+          setModalContent(null);
+          setTitle("Scan your fridge...");
+        }}
         footer={null}
       >
-        <video className="camera-modal-video"></video>
-        <div className="camera-modal-footer">
-          <button className="camera-modal-button"></button>
-          <button className="camera-modal-action-button"></button>
-        </div>
+        {modalContent || (
+          <video ref={videoRef} className="camera-modal-video"></video>
+        )}
+        {!modalContent && (
+          <div className="camera-modal-footer">
+            <button
+              className="camera-modal-button"
+              onClick={captureImage}
+            ></button>
+            <button
+              className="camera-modal-action-button"
+              onClick={captureImage}
+            ></button>
+          </div>
+        )}
       </Modal>
     </>
   );

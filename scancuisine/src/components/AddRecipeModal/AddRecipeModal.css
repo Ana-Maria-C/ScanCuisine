@@ -9,11 +9,12 @@
   border-radius: 8px;
   padding: 30px;
   max-width: 70vw;
-  max-height: 70vh;
+  max-height: 80vh;
   margin: auto;
   text-align: center;
   border: 3px solid #36134c;
   /*backdrop-filter: blur(50px);*/
+  box-shadow: 0 0 0 700px rgba(20, 2, 27, 0.1);
 }
 
 .modal-title {
