@@ -12,6 +12,7 @@ import axios from "axios";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { storage } from "../../firebase";
+import { get } from "http";
 
 const { SubMenu } = Menu;
 
@@ -27,6 +28,35 @@ interface Cuisine {
   recipeIds: string[];
 }
 
+interface Recipe {
+  id: string;
+  authorEmail: string;
+  name: string;
+  ingredients: string[];
+  preparationMethod: string;
+  imageUrl: string;
+  category: string;
+  cuisine: string;
+  videoUrl: string;
+  commentId: string[];
+  likes: number;
+}
+
+interface Ingredient {
+  aisle: string[];
+  amount: number;
+  consistency: string;
+  id: number;
+  image: string;
+  measures: {};
+  meta: string[];
+  name: string;
+  nameClean: string;
+  original: string;
+  originalName: string;
+  unit: string;
+}
+
 function Navbar() {
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -38,12 +68,29 @@ function Navbar() {
   const [cuisines, setCuisines] = useState<Cuisine[]>([]);
   const [cameraVisible, setCameraVisible] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [imageUrl, setImageUrl] = useState<string>("");
 
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [title, setTitle] = useState<string>("Scan your fridge...");
+  const [ingredients, setIngredients] = useState<string[]>([
+    "milk",
+    "sugar",
+    "eggs",
+    "jam",
+    "flour",
+  ]);
+
+  const XRapidAPIKey = "75af58f578msh272dfd8ac1822c4p150537jsn4d64d2cb298b";
+  const [showViewRecipeButton, setShowViewRecipeButton] = useState(false);
 
   const navigate = useNavigate();
+
+  const getEmail = async () => {
+    const myToken = localStorage.getItem("token");
+    const response = await axios.get(
+      `http://localhost:8090/api/users/token/${myToken}`
+    );
+    return response.data.email;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -165,17 +212,6 @@ function Navbar() {
         canvas.toBlob(async (blob) => {
           if (blob) {
             await uploadToStorage(blob);
-            // Închideți camera după încărcarea imaginii
-            closeCamera();
-            // Setează conținutul modalului cu un video de la o adresă URL specificată
-            setTitle("Searching for recipes...");
-            setModalContent(
-              <img
-                className="camera-modal-image"
-                src="https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/gif%2Fsearch_recipe_gif_123456789.gif?alt=media&token=641005bd-0ddf-4720-a79d-d5e672e49d20"
-                alt="Recipe GIF"
-              />
-            );
           }
         }, "image/jpeg");
       }
@@ -183,22 +219,149 @@ function Navbar() {
   };
 
   const uploadToStorage = async (blob: Blob) => {
+    const userEmail = await getEmail();
+    console.log("email", userEmail);
     const formData = new FormData();
+
     // generate a unique image name
     const imageName = `$image_${uuidv4()}`;
     formData.append("file", blob, imageName);
-    console.log("formData", formData.values);
     try {
       // Crearea unei referințe de stocare
       const imageRef = ref(storage, `scanImages/${imageName}`);
       // Încărcați fișierul în storage
       const snapshot = await uploadBytes(imageRef, blob);
 
+      // Închideți camera după încărcarea imaginii
+      closeCamera();
+      // Setează conținutul modalului cu un video de la o adresă URL specificată
+      setTitle("Searching for recipes...");
+      setModalContent(
+        <img
+          className="camera-modal-image"
+          src="https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/gif%2Fsearch_recipe_gif_123456789.gif?alt=media&token=641005bd-0ddf-4720-a79d-d5e672e49d20"
+          alt="Recipe GIF"
+        />
+      );
+
       // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
       const imageUrlDownload = await getDownloadURL(imageRef);
-
       console.log("image url", imageUrlDownload);
-      /* message.success("Image uploaded successfully!");*/
+
+      // sterg retetele pe baza ngredientelor anterioare
+      /*const response_delete = await axios.delete(
+        `http://localhost:8090/api/recipe-based-on-ingredients/${email}`
+      );*/
+
+      // trimit url imagine catre api-ul de scanare a imaginii
+      const options_1 = {
+        method: "POST",
+        url: "https://image-describing-ai-visual-decoder.p.rapidapi.com/describe_image",
+        headers: {
+          "content-type": "application/json",
+          "Content-Type": "application/json",
+          "X-RapidAPI-Key": XRapidAPIKey,
+          "X-RapidAPI-Host":
+            "image-describing-ai-visual-decoder.p.rapidapi.com",
+        },
+        data: {
+          image_url: imageUrlDownload,
+          question: "What ingredients do you recognize in the image?",
+        },
+      };
+
+      try {
+        //const response = await axios.request(options_1);  --decomenteaza
+        //console.log(response.data.response);            --decomenteaza
+        // extract ingredients from response
+        //const ingredients = response.data.response;     --decomenteaza
+        //setIngredients(ingredients);                    --decomenteaza
+      } catch (error) {
+        console.error(error);
+      }
+
+      // get recipes based on ingredients
+      const ingredients_to_string = ingredients.join(",");
+
+      const options_2 = {
+        method: "GET",
+        url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients",
+        params: {
+          ingredients: ingredients_to_string,
+          number: "8",
+          ignorePantry: "true",
+          ranking: "1",
+        },
+        headers: {
+          "X-RapidAPI-Key": XRapidAPIKey,
+          "X-RapidAPI-Host":
+            "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+        },
+      };
+      const response = await axios.request(options_2);
+      console.log("recipe based on ingredients", response.data);
+
+      // get the recommended recipes based on the ids
+
+      // extrag id -ul pentru fiecare reteta
+      const ids = [];
+
+      for (let element of response.data) {
+        ids.push(element.id);
+      }
+
+      // extrag informatiile pentru fiecare reteta pe baza id-ului
+      for (let id of ids) {
+        const options = {
+          method: "GET",
+          url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${id}/information`,
+          headers: {
+            "X-RapidAPI-Key": XRapidAPIKey,
+            "X-RapidAPI-Host":
+              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+          },
+        };
+
+        const response = await axios.request(options);
+        //console.log("info recipe based on id", response.data);
+
+        // postez reteta in baza de date folosind informatiile extrase de mai sus
+        let preparationMethodforRecommendedRecipe = response.data.instructions;
+        if (preparationMethodforRecommendedRecipe === null) {
+          preparationMethodforRecommendedRecipe = response.data.summary;
+        }
+        const newRecipe = {
+          id: "",
+          authorEmail: userEmail,
+          name: response.data.title,
+          ingredients: response.data.extendedIngredients.map(
+            (ingredient: Ingredient) => ingredient.name
+          ),
+          preparationMethod: preparationMethodforRecommendedRecipe,
+          imageUrl: response.data.image,
+          category: response.data.dishTypes[0],
+          cuisine: response.data.cuisines[0],
+          videoUrl: "",
+          commentId: [],
+          likes: 0,
+          datePosted: new Date(),
+        };
+        console.log("new recipe", newRecipe);
+        // post the recipe to the database
+        const postRecipe = await axios.post(
+          "http://localhost:8090/api/recipe-based-on-ingredients",
+          newRecipe
+        );
+        console.log(
+          "Response from adding recipe based on ingredients:",
+          postRecipe
+        );
+        if (postRecipe.status === 200) {
+          setShowViewRecipeButton(true);
+        }
+      }
+
+      // final
     } catch (error) {
       console.error("Error uploading image:", error);
       message.error("Failed to upload image. Please try again.");
@@ -283,9 +446,11 @@ function Navbar() {
         title={title}
         visible={cameraVisible || modalContent !== null}
         onCancel={() => {
+          closeCamera();
           setCameraVisible(false);
           setModalContent(null);
           setTitle("Scan your fridge...");
+          setShowViewRecipeButton(false);
         }}
         footer={null}
       >
@@ -303,6 +468,16 @@ function Navbar() {
               onClick={captureImage}
             ></button>
           </div>
+        )}
+        {showViewRecipeButton == true && (
+          <button className="view_recipe_based_on_ingredients">
+            <a
+              className="view_recipe_based_on_ingredients_link"
+              href="/recipe_from_api"
+            >
+              View recipe
+            </a>
+          </button>
         )}
       </Modal>
     </>

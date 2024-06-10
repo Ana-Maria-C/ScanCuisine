@@ -181,6 +181,15 @@ function Recipe() {
           `http://localhost:8090/api/recipes/${id}`
         );
         setRecipe(response.data);
+        // verificam daca reteta nu este din alta sursa
+        /*if (response.data == null || response.data == undefined) {
+          console.log("recipe from api");
+          const response = await axios.get(
+            `http://localhost:8090/api/recipe-based-on-ingredients/getRecipeById/${id}`
+          );
+          setRecipe(response.data);
+        }
+        */
         setLoading(false);
 
         if (response.data) {

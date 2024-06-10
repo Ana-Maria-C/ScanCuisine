@@ -50,13 +50,13 @@ public class RecipeService {
             if(recipe.getCategory()==null || recipe.getCategory().equals("")){
                 recipe.setCategory("Other");
             }
-            if(recipe.getCuisine()==null || recipe.getCategory().equals("")){
+            if(recipe.getCuisine()==null || recipe.getCuisine().equals("")){
                 recipe.setCuisine("Other");
             }
-            if(recipe.getImageUrl()==null || recipe.getCategory().equals("")){
+            if(recipe.getImageUrl()==null || recipe.getImageUrl().equals("")){
                 recipe.setImageUrl("");
             }
-            if(recipe.getVideoUrl()==null || recipe.getCategory().equals("")){
+            if(recipe.getVideoUrl()==null || recipe.getVideoUrl().equals("")){
                 recipe.setVideoUrl("");
             }
             if(recipe.getCommentId().isEmpty()){

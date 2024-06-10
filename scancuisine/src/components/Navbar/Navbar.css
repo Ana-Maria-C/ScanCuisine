@@ -108,3 +108,14 @@
   border-radius: 40px;
   box-shadow: 0 0 20px 10px rgba(68, 9, 91, 0.1);
 }
+
+.view_recipe_based_on_ingredients {
+  margin-left: 330px;
+  margin-top: -10px;
+}
+
+.view_recipe_based_on_ingredients_link {
+  font-size: 1.3rem;
+  color: #f0f0f0 !important;
+  text-decoration: none !important;
+}
