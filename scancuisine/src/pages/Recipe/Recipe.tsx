@@ -174,26 +174,67 @@ function Recipe() {
 
   const menu = <Menu className="drop-down-menu" items={getMenuItems()} />;
 
-  useEffect(() => {
-    const fetchRecipe = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:8090/api/recipes/${id}`
-        );
-        setRecipe(response.data);
-        // verificam daca reteta nu este din alta sursa
-        /*if (response.data == null || response.data == undefined) {
-          console.log("recipe from api");
-          const response = await axios.get(
-            `http://localhost:8090/api/recipe-based-on-ingredients/getRecipeById/${id}`
-          );
-          setRecipe(response.data);
-        }
-        */
-        setLoading(false);
+  const getRecipe = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recipes/${id}`
+      );
+      setRecipe(response.data);
+      setLoading(false);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recipe:", error);
+      return null;
+    }
+  };
 
-        if (response.data) {
-          const result = await getNutrition(response.data.name);
+  const getRecipeFromApi = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recipe-based-on-ingredients/getRecipeById/${id}`
+      );
+      setRecipe(response.data);
+      setLoading(false);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recipe:", error);
+      return null;
+    }
+  };
+
+  const getRecommendedRecipes = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recommended-recipe/getRecipeById/${id}`
+      );
+      setRecipe(response.data);
+      setLoading(false);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching recipe:", error);
+      return null;
+    }
+  };
+
+  const fetchRecipe = async () => {
+    const response = await getRecipe();
+    if (!response) {
+      const responseApi = await getRecipeFromApi();
+      if (!responseApi) {
+        const response_recommended = await getRecommendedRecipes();
+        return response_recommended;
+      }
+      return responseApi;
+    }
+    return response;
+  };
+
+  useEffect(() => {
+    const fetchRecipeInformations = async () => {
+      try {
+        const recipe = await fetchRecipe();
+        if (recipe) {
+          const result = await getNutrition(recipe.name);
           console.log("result", result);
           // set the nutrition data
           if (
@@ -231,7 +272,7 @@ function Recipe() {
       }
     };
 
-    fetchRecipe();
+    fetchRecipeInformations();
     fetchRecipeComments();
   }, [id]);
 
@@ -308,6 +349,7 @@ function Recipe() {
         </div>
         <div className="recipe-ingredients">
           <h2 className="sub-title-ingredients">Ingredients</h2>
+
           <div className="recipe-ingredients-container">
             <ul>
               {recipe.ingredients.map((ingredient, index) => (

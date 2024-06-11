@@ -84,10 +84,8 @@ public class RecipeService {
         for (DocumentSnapshot document : querySnapshot.getDocuments()) {
             Recipe recipe = document.toObject(Recipe.class);
             assert recipe != null;
-            if(recipe.getCategory().indexOf('@') == -1)
-            {
-                recipeList.add(recipe);
-            }
+            recipeList.add(recipe);
+
         }
 
         return recipeList;
@@ -288,22 +286,4 @@ public class RecipeService {
         return recipes;
     }
 
-    public List<Recipe> getUserRecommendationRecipe(String email) {
-        List<Recipe> recipes = new ArrayList<>();
-        try {
-            User user = this.userService.getUserbyEmail(email);
-            if (user == null) {
-                return new ArrayList<>();
-            }
-            for (Recipe recipe : this.getRecipesOfUser("recomendedrecipes@gmail.com")) {
-                if(recipe.getCategory().equals(email)){
-                    recipes.add(recipe);
-                }
-            }
-            return recipes;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return recipes;
-    }
 }

@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 @Service
-public class RecipeBasedOnIngredientsService {
-
-    private static final String COLLECTION_NAME = "recipesBasedOnIngredients";
+public class RecommendedRecipeService {
+    private static final String COLLECTION_NAME = "recommendedRecipe";
     @Autowired
     private UserService userService;
-    public String postRecipeBasedOnIngredients(Recipe recipe) {
+
+    public String postRecommendedRecipe(Recipe recipe) {
         try {
             Firestore dbFirestore = FirestoreClient.getFirestore();
             CollectionReference recipesCollection = dbFirestore.collection(COLLECTION_NAME);
@@ -35,29 +35,28 @@ public class RecipeBasedOnIngredientsService {
                 if (user == null) {
                     return "User with email " + recipe.getAuthorEmail() + " does not exist.";
                 }
-                if(recipe.getIngredients().isEmpty())
-                {
+                if (recipe.getIngredients().isEmpty()) {
                     return "Recipe must have at least one ingredient";
                 }
-                if(recipe.getPreparationMethod().equals("")){
+                if (recipe.getPreparationMethod().equals("")) {
                     return "Recipe must have a preparation method";
                 }
-                if(recipe.getName().equals("")){
+                if (recipe.getName().equals("")) {
                     return "Recipe must have a name";
                 }
-                if(recipe.getCategory()==null || recipe.getCategory().equals("")){
+                if (recipe.getCategory() == null || recipe.getCategory().equals("")) {
                     recipe.setCategory("Other");
                 }
-                if(recipe.getCuisine()==null || recipe.getCuisine().equals("")){
+                if (recipe.getCuisine() == null || recipe.getCuisine().equals("")) {
                     recipe.setCuisine("Other");
                 }
-                if(recipe.getImageUrl()==null || recipe.getImageUrl().equals("")){
+                if (recipe.getImageUrl() == null || recipe.getImageUrl().equals("")) {
                     recipe.setImageUrl("");
                 }
-                if(recipe.getVideoUrl()==null || recipe.getVideoUrl().equals("")){
+                if (recipe.getVideoUrl() == null || recipe.getVideoUrl().equals("")) {
                     recipe.setVideoUrl("");
                 }
-                if(recipe.getCommentId().isEmpty()){
+                if (recipe.getCommentId().isEmpty()) {
                     recipe.setCommentId(new ArrayList<>());
                 }
                 recipe.setLikes(0);
@@ -67,15 +66,14 @@ public class RecipeBasedOnIngredientsService {
                 return collectionsApiFuture.get().getUpdateTime().toString();
 
             } else {
-                return  "Recipe with id " + recipe.getId() + " already exists.";
+                return "Recipe with id " + recipe.getId() + " already exists.";
             }
         } catch (Exception e) {
             return "A apărut o eroare: " + e.getMessage();
         }
     }
 
-
-    public List<Recipe> getAllRecipeBasedOnIngredients() throws ExecutionException, InterruptedException {
+    public List<Recipe> getAllRecommendedRecipe() throws ExecutionException, InterruptedException {
         Firestore dbFirestore = FirestoreClient.getFirestore();
         CollectionReference recipesCollection = dbFirestore.collection(COLLECTION_NAME);
         ApiFuture<QuerySnapshot> querySnapshotApiFuture = recipesCollection.get();
@@ -86,19 +84,17 @@ public class RecipeBasedOnIngredientsService {
             Recipe recipe = document.toObject(Recipe.class);
             assert recipe != null;
             recipeList.add(recipe);
-
         }
-
         return recipeList;
     }
 
-    public List<Recipe> getRecipeBasedOnIngredientsByAuthor(String authorEmail) throws ExecutionException, InterruptedException {
+    public List<Recipe> getRecommendedRecipeByAuthor(String authorEmail) throws ExecutionException, InterruptedException {
         List<Recipe> recipes = new ArrayList<>();
         if(userService.getUserbyEmail(authorEmail) == null) {
             return new ArrayList<>(); // Returnează o listă goală dacă utilizatorul nu exista
         }
 
-        List<Recipe> allRecipes = this.getAllRecipeBasedOnIngredients();
+        List<Recipe> allRecipes = this.getAllRecommendedRecipe();
         for(Recipe recipe : allRecipes) {
             if (recipe.getAuthorEmail().equals(authorEmail)) {
                 recipes.add(recipe);
@@ -107,11 +103,11 @@ public class RecipeBasedOnIngredientsService {
         return recipes;
     }
 
-    public String deleteRecipeBasedOnIngredientsByAuthor(String authorEmail) {
+    public String deleteRecommendedRecipeByAuthor(String authorEmail) {
         try {
             Firestore dbFirestore = FirestoreClient.getFirestore();
             CollectionReference recipesCollection = dbFirestore.collection(COLLECTION_NAME);
-            List<Recipe> recipes = this.getRecipeBasedOnIngredientsByAuthor(authorEmail);
+            List<Recipe> recipes = this.getRecommendedRecipeByAuthor(authorEmail);
             for(Recipe recipe : recipes) {
                 ApiFuture<WriteResult> writeResult = recipesCollection.document(recipe.getId()).delete();
             }
@@ -121,7 +117,7 @@ public class RecipeBasedOnIngredientsService {
         }
     }
 
-    public Recipe getRecipeBasedOnIngredientsById(String id) {
+    public Recipe getRecommendedRecipeById(String id) {
         try {
             Firestore dbFirestore = FirestoreClient.getFirestore();
             DocumentReference documentReference = dbFirestore.collection(COLLECTION_NAME).document(id);

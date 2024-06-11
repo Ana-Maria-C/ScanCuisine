@@ -1,7 +1,8 @@
 .custom-card {
   width: 250px;
   height: 300px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
+  box-shadow: 0 0 15px 3px rgba(127, 20, 169, 0.1);
 }
 
 .custom-card img {

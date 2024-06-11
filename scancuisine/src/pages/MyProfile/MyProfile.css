@@ -158,6 +158,20 @@ h1 {
   font-size: 1.2rem;
 }
 
+.recommended-recipe-class {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.recommended-recipe-class-icon {
+  margin-left: 15px;
+  font-size: 22px; /* Setează dimensiunea dorită */
+  width: 24px; /* Setează lățimea dorită */
+  height: 24px;
+}
+
 @media screen and (max-width: 1024px) {
   .profileimage {
     padding: 20px;

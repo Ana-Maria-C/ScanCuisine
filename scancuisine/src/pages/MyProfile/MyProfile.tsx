@@ -9,6 +9,7 @@ import { storage } from "../../firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import imageCompression from "browser-image-compression";
+import { ReloadOutlined } from "@ant-design/icons";
 
 interface Recipe {
   id: string;
@@ -61,46 +62,40 @@ function MyProfile() {
   const [isAddRecipeModalOpen, setIsAddRecipeModalOpen] = useState(false); // State to manage the visibility of the AddRecipeModal
   const [userRecipes, setUserRecipes] = useState<Recipe[]>([]);
   const [userFavoriteRecipes, setUserFavoriteRecipes] = useState<Recipe[]>([]);
+
   //const [followedPeople, setFollowedPeople] = useState<FollowedPeople[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [recipeIsLoading, setRecipeIsLoading] = useState(false);
-  const [favoriteRecipeIsLoading, setFavoriteRecipeIsLoading] = useState(false);
-  const [recommendationsIsLoading, setRecommendationsIsLoading] =
-    useState(false);
-  //const [followedPeopleIsLoading, setFollowedPeopleIsLoading] = useState(false);
+
   // variable to store the recommended recipes
   const [favoriteRecipeIds, setFavoriteRecipeIds] = useState<string[]>([]);
   const [recommendedRecipes, setRecommendedRecipes] = useState<Recipe[]>([]);
   const XRapidAPIKey = "75af58f578msh272dfd8ac1822c4p150537jsn4d64d2cb298b";
 
-  useEffect(() => {
-    async function fetchRecipes() {
-      try {
-        const response = await axios.get(
-          `http://localhost:8090/api/recipes/user/${email}`
-        );
-        setUserRecipes(response.data);
-      } catch (error) {
-        console.error("Error fetching user recipes:", error);
-      }
+  const fetchRecipes = async (userEmail: String) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recipes/user/${userEmail}`
+      );
+      setUserRecipes(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user recipes:", error);
+      return null;
     }
-    fetchRecipes();
-  }, [email, recipeIsLoading]);
+  };
 
-  useEffect(() => {
-    async function fetchFavoriteRecipes() {
-      try {
-        const response = await axios.get(
-          `http://localhost:8090/api/recipes/favorite/${email}`
-        );
-        setUserFavoriteRecipes(response.data);
-        return response.data;
-      } catch (error) {
-        console.error("Error fetching user favorite recipes:", error);
-      }
+  const fetchFavoriteRecipes = async (userEmail: String) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recipes/favorite/${userEmail}`
+      );
+      setUserFavoriteRecipes(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user favorite recipes:", error);
+      return null;
     }
-    fetchFavoriteRecipes();
-  }, [email, favoriteRecipeIsLoading]);
+  };
 
   /*useEffect(() => {
     async function fetchFollowedPeople() {
@@ -116,100 +111,93 @@ function MyProfile() {
   }, [email, followedPeopleIsLoading]);
   */
 
-  useEffect(() => {
-    async function getRecommendedRecipes() {
-      let recommendedRecipeUrls = [];
-      try {
-        let firstFiveRecipes = userFavoriteRecipes.slice(0, 5);
-        let uniqueIds = new Set(favoriteRecipeIds);
-        for (let recipe of firstFiveRecipes) {
-          // extract id from extern api
-          const options = {
-            method: "GET",
-            url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch",
-            params: { query: recipe.name },
-            headers: {
-              "X-RapidAPI-Key": XRapidAPIKey,
-              "X-RapidAPI-Host":
-                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-            },
-          };
-          const response = await axios.request(options);
-          if (response.data.results) {
-            uniqueIds.add(response.data.results[0]["id"]);
-          }
+  const getRecommendedRecipes = async (
+    UserFavoriteRecipes: Recipe[],
+    userEmail: String
+  ) => {
+    let recommendedRecipeUrls = [];
+    let firstFiveRecipes = UserFavoriteRecipes.slice(0, 5);
+    let uniqueIds = new Set(favoriteRecipeIds);
+    try {
+      for (let recipe of firstFiveRecipes) {
+        // extract id from extern api
+        const options = {
+          method: "GET",
+          url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch",
+          params: { query: recipe.name },
+          headers: {
+            "X-RapidAPI-Key": XRapidAPIKey,
+            "X-RapidAPI-Host":
+              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+          },
+        };
+        const response = await axios.request(options);
+        if (response.data.results) {
+          uniqueIds.add(response.data.results[0]["id"]);
         }
-        setFavoriteRecipeIds(Array.from(uniqueIds));
-        console.log("Favorite recipe ids:", favoriteRecipeIds);
-      } catch (error) {
-        console.error("Error getting the id for my favorite recipes:", error);
       }
+      const listFavoriteRecipeIds = Array.from(uniqueIds);
 
       // get the recommended recipes based on the ids
-      try {
-        for (let id of favoriteRecipeIds) {
-          const options = {
-            method: "GET",
-            url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${id}/similar`,
-            headers: {
-              "X-RapidAPI-Key": XRapidAPIKey,
-              "X-RapidAPI-Host":
-                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-            },
-          };
-          const response = await axios.request(options);
-          if (response.data) {
-            const firstTwoRecommendedRecipe = response.data.slice(0, 2);
-            for (let recipe of firstTwoRecommendedRecipe) {
-              recommendedRecipeUrls.push(recipe.sourceUrl);
-            }
+
+      for (let id of listFavoriteRecipeIds) {
+        const options = {
+          method: "GET",
+          url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${id}/similar`,
+          headers: {
+            "X-RapidAPI-Key": XRapidAPIKey,
+            "X-RapidAPI-Host":
+              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+          },
+        };
+        const response = await axios.request(options);
+        if (response.data) {
+          const firstTwoRecommendedRecipe = response.data.slice(0, 2);
+          for (let recipe of firstTwoRecommendedRecipe) {
+            recommendedRecipeUrls.push(recipe.sourceUrl);
           }
         }
-        console.log("Recommended recipe urls:", recommendedRecipeUrls);
-      } catch (error) {
-        console.error("Error getting the recommended recipes:", error);
       }
 
       // extract the recommended recipes from the urls
-      try {
-        for (let url of recommendedRecipeUrls) {
-          const options = {
-            method: "GET",
-            url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/extract",
-            params: {
-              url: url,
-            },
-            headers: {
-              "X-RapidAPI-Key": XRapidAPIKey,
-              "X-RapidAPI-Host":
-                "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-            },
-          };
 
-          const response = await axios.request(options);
-          // store the recommended recipes in my database
-          let preparationMethodforRecommendedRecipe =
-            response.data.instructions;
-          if (preparationMethodforRecommendedRecipe === null) {
-            preparationMethodforRecommendedRecipe = response.data.summary;
-          }
-          const newRecommendedRecipe = {
-            id: "",
-            authorEmail: "recomendedrecipes@gmail.com",
-            name: response.data.title,
-            ingredients: response.data.extendedIngredients.map(
-              (ingredient: Ingredient) => ingredient.name
-            ),
-            preparationMethod: preparationMethodforRecommendedRecipe,
-            imageUrl: response.data.image,
-            category: email,
-            cuisine: response.data.cuisines[0],
-            videoUrl: "",
-            commentId: [],
-            likes: 0,
-            datePosted: new Date(),
-          };
-          /*id: string;
+      for (let url of recommendedRecipeUrls) {
+        const options = {
+          method: "GET",
+          url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/extract",
+          params: {
+            url: url,
+          },
+          headers: {
+            "X-RapidAPI-Key": XRapidAPIKey,
+            "X-RapidAPI-Host":
+              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
+          },
+        };
+
+        const response = await axios.request(options);
+        // store the recommended recipes in my database
+        let preparationMethodforRecommendedRecipe = response.data.instructions;
+        if (preparationMethodforRecommendedRecipe === null) {
+          preparationMethodforRecommendedRecipe = response.data.summary;
+        }
+        const newRecommendedRecipe = {
+          id: "",
+          authorEmail: userEmail,
+          name: response.data.title,
+          ingredients: response.data.extendedIngredients.map(
+            (ingredient: Ingredient) => ingredient.name
+          ),
+          preparationMethod: preparationMethodforRecommendedRecipe,
+          imageUrl: response.data.image,
+          category: response.data.dishTypes[0],
+          cuisine: response.data.cuisines[0],
+          videoUrl: "",
+          commentId: [],
+          likes: 0,
+          datePosted: new Date(),
+        };
+        /*id: string;
             authorEmail: string;
             name: string;
             ingredients: string[];
@@ -221,78 +209,79 @@ function MyProfile() {
             commentId: string[];
             likes: number;
             */
-          const postRecipe = await axios.post(
-            "http://localhost:8090/api/recipes",
-            newRecommendedRecipe
-          );
-          console.log("Response from adding recommended recipe:", postRecipe);
-          // get User Recommended Recipes
-          const userRecommendedRecipesResponse = await axios.get(
-            `http://localhost:8090/api/recipes/userRecommendationRecipe/${email}`
-          );
-          setRecommendedRecipes(userRecommendedRecipesResponse.data);
-          console.log(
-            "User Recommended recipes:",
-            userRecommendedRecipesResponse.data
-          );
-        }
-      } catch (error) {
-        console.error("Error extracting the recommended recipes:", error);
+        const postRecipe = await axios.post(
+          "http://localhost:8090/api/recommended-recipe",
+          newRecommendedRecipe
+        );
+        console.log("Response from adding recommended recipe:", postRecipe);
       }
+    } catch (error) {
+      console.error("Error extracting the recommended recipes:", error);
     }
-    //getRecommendedRecipes();
-  }, [email, recommendationsIsLoading]);
+  };
+
+  const fetchUserRecommendedRecipes = async (userEmail: String) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8090/api/recommended-recipe/${userEmail}`
+      );
+      setRecommendedRecipes(response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching user recommended recipes:", error);
+    }
+  };
+
+  const fetchProfile = async () => {
+    try {
+      const myToken = localStorage.getItem("token");
+      const response = await axios.get(
+        `http://localhost:8090/api/users/token/${myToken}`
+      );
+      const {
+        lastName,
+        firstName,
+        email,
+        description,
+        imageUrl,
+        myRecipes,
+        myFavoriteRecipes,
+        followedPeople,
+      } = response.data;
+      setName(lastName);
+      setSurname(firstName);
+      setEmail(email);
+      setDescription(description);
+      if (imageUrl !== null && imageUrl !== "") {
+        setImageUrl(imageUrl);
+      } else {
+        setImageUrl("my_profile.png");
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching profile:", (error as Error).message);
+      return null;
+    }
+  };
 
   useEffect(() => {
-    async function fetchUserRecommendedRecipes() {
-      try {
-        const response = await axios.get(
-          `http://localhost:8090/api/recipes/userRecommendationRecipe/${email}`
+    const fetchProfileData = async () => {
+      const responseProfile = await fetchProfile();
+      const responseRecipes = await fetchRecipes(responseProfile.email);
+      const responseFavoriteRecipes = await fetchFavoriteRecipes(
+        responseProfile.email
+      );
+      if (responseFavoriteRecipes) {
+        /*await getRecommendedRecipes(
+          responseFavoriteRecipes,
+          responseProfile.email
+        );*/
+        const responseRecommendedRecipe = await fetchUserRecommendedRecipes(
+          responseProfile.email
         );
-        setRecommendedRecipes(response.data);
-      } catch (error) {
-        console.error("Error fetching user recommended recipes:", error);
       }
-    }
-    fetchUserRecommendedRecipes();
-  }, [email, recommendationsIsLoading]);
-
-  useEffect(() => {
-    async function fetchProfile() {
-      try {
-        const myToken = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:8090/api/users/token/${myToken}`
-        );
-        const {
-          lastName,
-          firstName,
-          email,
-          description,
-          imageUrl,
-          myRecipes,
-          myFavoriteRecipes,
-          followedPeople,
-        } = response.data;
-        setName(lastName);
-        setSurname(firstName);
-        setEmail(email);
-        setDescription(description);
-        if (imageUrl !== null && imageUrl !== "") {
-          setImageUrl(imageUrl);
-        } else {
-          setImageUrl("my_profile.png");
-        }
-      } catch (error) {
-        console.error("Error fetching profile:", (error as Error).message);
-      }
-    }
-
-    fetchProfile();
-    setFavoriteRecipeIsLoading(!favoriteRecipeIsLoading);
-    setRecipeIsLoading(!recipeIsLoading);
-    setRecommendationsIsLoading(!recommendationsIsLoading);
-    // setFollowedPeopleIsLoading(!followedPeopleIsLoading);
+    };
+    fetchProfileData();
   }, []);
 
   const handleEdit = () => {
@@ -385,6 +374,21 @@ function MyProfile() {
         console.error("Error compressing image:", error);
       }
     }
+  };
+
+  const handleReloadRecommendedRecipes = async () => {
+    // stergem recomandarile curente ale utilizatorului
+    const userEmail = await getUserEmail();
+    await axios.delete(
+      `http://localhost:8090/api/recommended-recipe/${userEmail}`
+    );
+    // obtinem noile recomandari de retete in functie de retetele favorite ale utilizatorului
+    await getRecommendedRecipes(userFavoriteRecipes, userEmail);
+
+    // actualizam lista de recomandari a utilizatorului
+    const responseRecommendedRecipe = await fetchUserRecommendedRecipes(
+      userEmail
+    );
   };
 
   return (
@@ -554,7 +558,15 @@ function MyProfile() {
         </div>
         */}
         <div className="following">
-          <h2>Recommended for you</h2>
+          <div className="recommended-recipe-class">
+            <h2>Recommended for you</h2>
+            <div className="recommended-recipe-class-icon">
+              <ReloadOutlined
+                title="Reload Recommended Recipes"
+                onClick={handleReloadRecommendedRecipes}
+              />
+            </div>
+          </div>
           <div className="myrecipes-container">
             {recommendedRecipes.length > 0 ? (
               recommendedRecipes.map((recipe) => (

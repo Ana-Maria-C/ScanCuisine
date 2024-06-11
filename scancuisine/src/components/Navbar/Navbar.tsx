@@ -249,9 +249,9 @@ function Navbar() {
       console.log("image url", imageUrlDownload);
 
       // sterg retetele pe baza ngredientelor anterioare
-      /*const response_delete = await axios.delete(
-        `http://localhost:8090/api/recipe-based-on-ingredients/${email}`
-      );*/
+      const response_delete = await axios.delete(
+        `http://localhost:8090/api/recipe-based-on-ingredients/${userEmail}`
+      );
 
       // trimit url imagine catre api-ul de scanare a imaginii
       const options_1 = {
@@ -309,6 +309,7 @@ function Navbar() {
       for (let element of response.data) {
         ids.push(element.id);
       }
+      console.log("ids", ids);
 
       // extrag informatiile pentru fiecare reteta pe baza id-ului
       for (let id of ids) {
@@ -356,11 +357,8 @@ function Navbar() {
           "Response from adding recipe based on ingredients:",
           postRecipe
         );
-        if (postRecipe.status === 200) {
-          setShowViewRecipeButton(true);
-        }
       }
-
+      setShowViewRecipeButton(true);
       // final
     } catch (error) {
       console.error("Error uploading image:", error);
