@@ -188,10 +188,10 @@ function Recipe() {
     }
   };
 
-  const getRecipeFromApi = async () => {
+  const getRecommendedRecipes = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8090/api/recipe-based-on-ingredients/getRecipeById/${id}`
+        `http://localhost:8090/api/recommended-recipe/getRecipeById/${id}`
       );
       setRecipe(response.data);
       setLoading(false);
@@ -202,10 +202,10 @@ function Recipe() {
     }
   };
 
-  const getRecommendedRecipes = async () => {
+  const getRecipeFromApi = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:8090/api/recommended-recipe/getRecipeById/${id}`
+        `http://localhost:8090/api/recipe-based-on-ingredients/getRecipeById/${id}`
       );
       setRecipe(response.data);
       setLoading(false);
