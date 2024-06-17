@@ -92,3 +92,21 @@
   padding: 10px; /* Adaugă un spațiu intern */
   border: 1px solid #ccc; /* Adaugă o bordură */
 }
+
+@media screen and (max-width: 768px) {
+  .modal-container {
+    width: 80vw;
+  }
+
+  .ingredients,
+  .preparation-method {
+    max-width: 96%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .ingredients,
+  .preparation-method {
+    max-width: 91%;
+  }
+}

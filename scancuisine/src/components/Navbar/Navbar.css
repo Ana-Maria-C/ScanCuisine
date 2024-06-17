@@ -104,7 +104,7 @@
   margin-bottom: 20px;
   max-width: 850px;
   max-height: 600px;
-  margin-left: 100px;
+  margin-left: 12%;
   border-radius: 40px;
   box-shadow: 0 0 20px 10px rgba(68, 9, 91, 0.1);
 }
@@ -118,4 +118,61 @@
   font-size: 1.3rem;
   color: #f0f0f0 !important;
   text-decoration: none !important;
+}
+
+@media screen and (max-width: 768px) {
+  .camera-modal {
+    width: 90vw;
+    height: 90vh;
+  }
+
+  .camera-modal-image {
+    width: 90vw;
+    height: 90vh;
+    max-width: 90vw;
+    max-height: 90vh;
+    margin-left: 0%;
+  }
+
+  .camera-modal-video {
+    width: 85vw;
+    height: 90vh;
+    margin-left: 20px;
+  }
+
+  .view_recipe_based_on_ingredients {
+    margin-left: 40%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .camera-modal-image {
+    margin-left: -4%;
+  }
+  .view_recipe_based_on_ingredients {
+    margin-left: 28%;
+  }
+  .camera-modal-video {
+    margin-left: -3px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .camera-modal-image {
+    width: 90vw;
+    height: 90vh;
+    max-width: 90vw;
+    max-height: 90vh;
+    margin-left: -6%;
+  }
+  .camera-modal-video {
+    width: 85vw;
+    height: 90vh;
+  }
+  .view_recipe_based_on_ingredients {
+    margin-left: 25%;
+  }
+  .camera-modal-video {
+    margin-left: -7px;
+  }
 }

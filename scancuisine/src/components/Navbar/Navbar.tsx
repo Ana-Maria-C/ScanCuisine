@@ -271,11 +271,11 @@ function Navbar() {
       };
 
       try {
-        //const response = await axios.request(options_1);  --decomenteaza
-        //console.log(response.data.response);            --decomenteaza
-        // extract ingredients from response
-        //const ingredients = response.data.response;     --decomenteaza
-        //setIngredients(ingredients);                    --decomenteaza
+        //const response = await axios.request(options_1); //--decomenteaza
+        //console.log("ingrediente recunoscute: ", response.data.response); //--decomenteaza
+        //extract ingredients from response
+        //const ingredients = response.data.response; //--decomenteaza
+        //setIngredients(ingredients); //--decomenteaza
       } catch (error) {
         console.error(error);
       }

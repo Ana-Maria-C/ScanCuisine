@@ -7,7 +7,6 @@ import axios from "axios";
 import AddCommentModal from "../../components/AddCommentModal/AddCommentModal";
 import { EditOutlined } from "@ant-design/icons";
 import { Dropdown, Menu, Space } from "antd";
-import { get } from "http";
 
 interface Recipe {
   id: string;
@@ -194,6 +193,14 @@ function Recipe() {
         `http://localhost:8090/api/recommended-recipe/getRecipeById/${id}`
       );
       setRecipe(response.data);
+      /*if(response.data.videoUrl === null){
+        setRecipe({
+          ...response.data,
+          videoUrl:
+            " https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/videos%2Fdefaul_video_123456789.mp4?alt=media&token=fa051a0b-a359-43e1-8508-ff10e8f12c73",
+        });
+      }
+      */
       setLoading(false);
       return response.data;
     } catch (error) {
@@ -234,6 +241,7 @@ function Recipe() {
       try {
         const recipe = await fetchRecipe();
         if (recipe) {
+          // fetch the nutrition data
           const result = await getNutrition(recipe.name);
           console.log("result", result);
           // set the nutrition data
@@ -349,7 +357,6 @@ function Recipe() {
         </div>
         <div className="recipe-ingredients">
           <h2 className="sub-title-ingredients">Ingredients</h2>
-
           <div className="recipe-ingredients-container">
             <ul>
               {recipe.ingredients.map((ingredient, index) => (
@@ -381,8 +388,15 @@ function Recipe() {
         </div>
         <div className="recipe-video">
           <h2 className="sub-title">Video </h2>
-          <video controls className="video-container">
-            <source src={recipe.videoUrl} type="video/mp4" />
+          <video controls autoPlay loop className="video-container">
+            <source
+              src={
+                recipe.videoUrl
+                  ? recipe.videoUrl
+                  : "https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/videos%2Fdefaul_video_123456789.mp4?alt=media&token=fa051a0b-a359-43e1-8508-ff10e8f12c73"
+              }
+              type="video/mp4"
+            />
           </video>
         </div>
       </div>

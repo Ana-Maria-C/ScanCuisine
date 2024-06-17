@@ -24,6 +24,8 @@
   flex: 1;
   gap: 20px;
   flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
 }
 
 .empty-description {
@@ -34,5 +36,26 @@
   font-size: 1.5rem;
   text-align: center;
   color: #6f1787;
-  margin-left: 32%;
+}
+
+@media screen and (max-width: 480px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  .search-results-container {
+    max-width: 100vw;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .empty-description {
+    flex-direction: column;
+    width: 70vw;
+    padding: 5px;
+    margin-left: 0;
+  }
 }

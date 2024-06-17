@@ -175,6 +175,7 @@ h1 {
 @media screen and (max-width: 1024px) {
   .profileimage {
     padding: 20px;
+    border-radius: 30px;
   }
 
   .myrecipes-container,
@@ -196,8 +197,9 @@ h1 {
 
 @media screen and (max-width: 768px) {
   .profileimage {
-    width: 230px;
+    width: 240px;
     padding: 20px;
+    border-radius: 30px;
   }
 
   .myrecipes-container,
@@ -235,8 +237,9 @@ h1 {
   }
 
   .profileimage {
-    width: 150px;
-    height: 150px;
+    width: 250px;
+    height: 250px;
+    margin-left: 0px;
   }
 
   .description-field,
@@ -267,5 +270,14 @@ h1 {
 
   h2 {
     margin-bottom: 40px;
+  }
+
+  .recommended-recipe-class h2 {
+    margin-left: 130px;
+    margin-right: -50px;
+  }
+
+  .recommended-recipe-class-icon {
+    margin-right: 150px;
   }
 }
