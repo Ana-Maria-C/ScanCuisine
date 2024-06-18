@@ -271,11 +271,11 @@ function Navbar() {
       };
 
       try {
-        //const response = await axios.request(options_1); //--decomenteaza
-        //console.log("ingrediente recunoscute: ", response.data.response); //--decomenteaza
+        const response = await axios.request(options_1); //--decomenteaza
+        console.log("ingrediente recunoscute: ", response.data.response); //--decomenteaza
         //extract ingredients from response
-        //const ingredients = response.data.response; //--decomenteaza
-        //setIngredients(ingredients); //--decomenteaza
+        const ingredients = response.data.response; //--decomenteaza
+        setIngredients(ingredients); //--decomenteaza
       } catch (error) {
         console.error(error);
       }
@@ -467,7 +467,7 @@ function Navbar() {
             ></button>
           </div>
         )}
-        {showViewRecipeButton == true && (
+        {showViewRecipeButton === true && (
           <button className="view_recipe_based_on_ingredients">
             <a
               className="view_recipe_based_on_ingredients_link"
