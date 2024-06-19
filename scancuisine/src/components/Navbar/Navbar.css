@@ -9,8 +9,9 @@
   transition: top 0.3s; /* animație pentru tranziția de înălțime (apare/dispare) */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* adăugare umbre */
   padding: 10px;
-  padding-left: 80px;
+  padding-left: 50px;
   font-weight: bold;
+  backdrop-filter: blur(2px);
 }
 
 .navbar.hidden {
@@ -40,9 +41,13 @@
 }
 
 .navbar .camera-scan {
-  margin-left: 40%;
+  margin-left: 35%;
 }
 
+.drawer-title {
+  color: #8e24aa !important;
+  font-size: 1.2rem;
+}
 /* camera*/
 /* Stil pentru modal */
 
@@ -120,6 +125,40 @@
   text-decoration: none !important;
 }
 
+.hidden-desktop {
+  display: none;
+}
+
+.drawer {
+  background-color: #f4dcf6 !important;
+  backdrop-filter: blur(3px) !important;
+}
+
+.categories-drawer,
+.logout-drawer,
+.camera-scan-drawer,
+.myprofile-drawer,
+.about-drawer {
+  color: #8e24aa !important;
+  font-weight: bold !important;
+}
+
+.camera-scan-drawer,
+.myprofile-drawer {
+  font-size: 1.2rem !important;
+}
+
+@media screen and (max-width: 1024px) {
+  .navbar .camera-scan {
+    margin-left: 10%;
+  }
+
+  .navbar {
+    padding: 10px;
+    padding-left: 40px;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .camera-modal {
     width: 90vw;
@@ -143,6 +182,18 @@
   .view_recipe_based_on_ingredients {
     margin-left: 40%;
   }
+
+  .hidden-mobile {
+    display: none;
+  }
+
+  .hidden-desktop {
+    display: block;
+    margin-top: 15px;
+  }
+  .navbar .camera-scan {
+    margin-left: 55%;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -154,6 +205,12 @@
   }
   .camera-modal-video {
     margin-left: -3px;
+  }
+  .hidden-mobile {
+    display: none;
+  }
+  .navbar {
+    padding-left: 20px;
   }
 }
 
@@ -174,5 +231,14 @@
   }
   .camera-modal-video {
     margin-left: -7px;
+  }
+
+  /* stiluri pt navbar */
+  .navbar {
+    padding-left: 10px;
+    overflow: hidden;
+  }
+  .navbar-home {
+    font-size: 1rem;
   }
 }

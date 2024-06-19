@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Menu, Button, Input, message, Modal } from "antd";
+import { Menu, Button, Input, message, Modal, Drawer } from "antd";
 import { Link } from "react-router-dom";
 import {
   UserOutlined,
   SearchOutlined,
   CameraOutlined,
+  MenuOutlined,
 } from "@ant-design/icons";
 import "./Navbar.css";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +13,6 @@ import axios from "axios";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { v4 as uuidv4 } from "uuid";
 import { storage } from "../../firebase";
-import { get } from "http";
 
 const { SubMenu } = Menu;
 
@@ -58,6 +58,8 @@ interface Ingredient {
 }
 
 function Navbar() {
+  const [drawerVisible, setDrawerVisible] = useState(false);
+
   const [visible, setVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const token = localStorage.getItem("token");
@@ -82,6 +84,14 @@ function Navbar() {
   const XRapidAPIKey = "75af58f578msh272dfd8ac1822c4p150537jsn4d64d2cb298b";
   const [showViewRecipeButton, setShowViewRecipeButton] = useState(false);
 
+  const showDrawer = () => {
+    setDrawerVisible(true);
+  };
+
+  const closeDrawer = () => {
+    setDrawerVisible(false);
+  };
+
   const navigate = useNavigate();
 
   const getEmail = async () => {
@@ -95,6 +105,7 @@ function Navbar() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
+      console.log("token", token);
       setIsLoggedIn(true);
     }
 
@@ -133,6 +144,7 @@ function Navbar() {
   }, [isPopupOpen]);
 
   const handleLogout = () => {
+    closeDrawer();
     localStorage.removeItem("token");
     setIsLoggedIn(false);
     console.log("Logout successful");
@@ -142,6 +154,7 @@ function Navbar() {
   const handleSearchEnter = async (
     e: React.KeyboardEvent<HTMLInputElement>
   ) => {
+    closeDrawer();
     if (e.key === "Enter") {
       const inputElement = e.target as HTMLInputElement;
       const recipeName = inputElement.value.trim();
@@ -171,6 +184,7 @@ function Navbar() {
   };
 
   const openCamera = () => {
+    closeDrawer();
     setCameraVisible(true);
   };
 
@@ -372,11 +386,21 @@ function Navbar() {
         mode="horizontal"
         className={`navbar ${visible || isPopupOpen ? "" : "hidden"}`}
       >
-        <Menu.Item key="home">
-          <Link to="/home">Scan Cuisine</Link>
+        <Menu.Item
+          key="hamburger"
+          className="hamburger-menu hidden-desktop"
+          onClick={showDrawer}
+        >
+          <MenuOutlined className="hidden-desktop" />
         </Menu.Item>
-        <Menu.Item key="search" className="search-input">
+        <Menu.Item key="home">
+          <Link to="/home" className="navbar-home">
+            Scan Cuisine
+          </Link>
+        </Menu.Item>
+        <Menu.Item key="search" className="search-input hidden-mobile">
           <Input
+            className="hidden-mobile"
             prefix={<SearchOutlined />}
             placeholder="Find a recipe"
             onPressEnter={handleSearchEnter}
@@ -386,7 +410,9 @@ function Navbar() {
         </Menu.Item>
         <SubMenu
           key="categories"
-          title={<span className="categories-submenu">Categories</span>}
+          title={
+            <span className="categories-submenu hidden-mobile">Categories</span>
+          }
           popupClassName="categories-popup"
         >
           {categories.map((category) => (
@@ -402,7 +428,9 @@ function Navbar() {
         </SubMenu>
         <SubMenu
           key="cuisines"
-          title={<span className="categories-submenu">Cuisines</span>}
+          title={
+            <span className="categories-submenu hidden-mobile">Cuisines</span>
+          }
           popupClassName="cuisines-popup"
         >
           {cuisines.map((cuisine) => (
@@ -416,27 +444,45 @@ function Navbar() {
             </Menu.Item>
           ))}
         </SubMenu>
-        <Menu.Item key="scan" className="camera-scan" onClick={openCamera}>
-          <CameraOutlined />
+
+        <Menu.Item
+          key="scan"
+          className="camera-scan hidden-mobile"
+          onClick={openCamera}
+        >
+          <CameraOutlined className="hidden-mobile" />
         </Menu.Item>
         {isLoggedIn ? (
           <>
-            <Menu.Item key="logout" className="logout" onClick={handleLogout}>
-              <Link to="">Log Out</Link>
+            <Menu.Item
+              key="logout"
+              className="logout hidden-mobile"
+              onClick={handleLogout}
+            >
+              <Link to="" className="hidden-mobile">
+                Log Out
+              </Link>
             </Menu.Item>
-            <Menu.Item key="profile" className="myprofile">
-              <Link to="/myprofile">
-                <Button icon={<UserOutlined />} key="My Profile"></Button>
+            <Menu.Item key="profile" className="myprofile hidden-mobile">
+              <Link to="/myprofile" className="hidden-mobile">
+                <Button
+                  icon={<UserOutlined hidden-mobile />}
+                  key="My Profile"
+                ></Button>
               </Link>
             </Menu.Item>
           </>
         ) : (
-          <Menu.Item key="login" className="logout">
-            <Link to="/login">Log In</Link>
+          <Menu.Item key="login" className="logout hidden-mobile">
+            <Link to="/login" className="hidden-mobile">
+              Log In
+            </Link>
           </Menu.Item>
         )}
-        <Menu.Item key="about">
-          <Link to="/about">About Us</Link>
+        <Menu.Item key="about hidden-mobile">
+          <Link to="/about" className="hidden-mobile">
+            About Us
+          </Link>
         </Menu.Item>
       </Menu>
       <Modal
@@ -478,6 +524,95 @@ function Navbar() {
           </button>
         )}
       </Modal>
+      <Drawer
+        title={<span className="drawer-title">Scan Cuisine</span>}
+        placement="left"
+        onClose={closeDrawer}
+        visible={drawerVisible}
+        className="drawer"
+      >
+        <Menu mode="vertical" className="drawer">
+          <Menu.Item key="search-drawer">
+            <Input
+              prefix={<SearchOutlined />}
+              placeholder="Find a recipe"
+              onPressEnter={handleSearchEnter}
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+          </Menu.Item>
+          <SubMenu
+            key="categories"
+            title={<span className="categories-drawer">Categories</span>}
+            popupClassName="categories-popup"
+          >
+            {categories.map((category) => (
+              <Menu.Item
+                key={category.id}
+                onClick={() => handleMenuClickCategory(category)}
+                onMouseEnter={() => setIsPopupOpen(true)}
+                onMouseLeave={() => setIsPopupOpen(false)}
+              >
+                {category.name}
+              </Menu.Item>
+            ))}
+          </SubMenu>
+          <SubMenu
+            key="cuisines"
+            title={<span className="categories-drawer">Cuisines</span>}
+            popupClassName="cuisines-popup"
+          >
+            {cuisines.map((cuisine) => (
+              <Menu.Item
+                key={cuisine.id}
+                onClick={() => handleMenuClickCuisine(cuisine)}
+                onMouseEnter={() => setIsPopupOpen(true)}
+                onMouseLeave={() => setIsPopupOpen(false)}
+              >
+                {cuisine.name}
+              </Menu.Item>
+            ))}
+          </SubMenu>
+          <Menu.Item
+            key="scan"
+            className="camera-scan-drawer"
+            onClick={openCamera}
+          >
+            <CameraOutlined className="camera-scan-drawer" />
+          </Menu.Item>
+          {isLoggedIn ? (
+            <>
+              <Menu.Item
+                key="logout"
+                className="logout-drawer"
+                onClick={handleLogout}
+              >
+                <Link to="">Log Out</Link>
+              </Menu.Item>
+              <Menu.Item key="profile" className="myprofile-drawer">
+                <Link to="/myprofile" onClick={closeDrawer}>
+                  <div>
+                    <span key="My Profile">
+                      {<UserOutlined className="myprofile-drawer" />}
+                    </span>
+                  </div>
+                </Link>
+              </Menu.Item>
+            </>
+          ) : (
+            <Menu.Item key="login" className="logout-drawer">
+              <Link to="/login" onClick={closeDrawer}>
+                Log In
+              </Link>
+            </Menu.Item>
+          )}
+          <Menu.Item key="about-drawer">
+            <Link to="/about" onClick={closeDrawer} className="about-drawer">
+              About Us
+            </Link>
+          </Menu.Item>
+        </Menu>
+      </Drawer>
     </>
   );
 }

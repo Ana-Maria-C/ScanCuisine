@@ -19,10 +19,10 @@ import Recipe_from_api from "../pages/Recipe_from_api/Recipe_from_api";
 
 export const router = (
   <Router>
-    <Navbar></Navbar>
+    <Navbar />
     <Routes>
       <Route path="/myprofile" element={<MyProfile />} />
-      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/" element={<Navigate to="/home" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/home" element={<Home />} />
