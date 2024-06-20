@@ -148,6 +148,22 @@
   font-size: 1.2rem !important;
 }
 
+.categories-popup-drawer {
+  color: #8e24aa !important;
+  background-color: #f4dcf6 !important;
+  width: 84vw !important;
+}
+
+.categorie-name-submenu {
+  color: #8e24aa !important;
+  background-color: rgba(243, 229, 245, 0.8);
+  backdrop-filter: blur(2px);
+}
+
+.categorie-name-submenu:hover {
+  background-color: #f4dcf6 !important;
+}
+
 @media screen and (max-width: 1024px) {
   .navbar .camera-scan {
     margin-left: 10%;

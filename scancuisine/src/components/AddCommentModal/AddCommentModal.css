@@ -12,6 +12,8 @@
   text-align: center;
   border: 3px solid #36134c;
   /*backdrop-filter: blur(50px);*/
+
+  box-shadow: 0 0 0 700px rgba(20, 2, 27, 0.1);
 }
 
 .modal-title {
@@ -48,4 +50,17 @@
 .add-button:hover,
 .close-button:hover {
   background-color: #5d1b7f; /* Schimbă culoarea butoanelor la hover */
+}
+
+@media screen and (max-width: 480px) {
+  .comment-container {
+    width: 60vw;
+    height: 55vh;
+  }
+
+  .comment-input {
+    width: 90%;
+    height: 100px;
+    margin-bottom: 30px;
+  }
 }

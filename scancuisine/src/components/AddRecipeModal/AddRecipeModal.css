@@ -96,6 +96,9 @@
 @media screen and (max-width: 768px) {
   .modal-container {
     width: 80vw;
+    max-width: 80vw;
+    height: 88vh;
+    max-height: 88vh;
   }
 
   .ingredients,

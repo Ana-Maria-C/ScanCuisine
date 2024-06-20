@@ -176,10 +176,12 @@ function Navbar() {
   };
 
   const handleMenuClickCategory = (category: Category) => {
+    closeDrawer();
     navigate(`/category/${category.name}`);
   };
 
   const handleMenuClickCuisine = (cuisine: Cuisine) => {
+    closeDrawer();
     navigate(`/cuisine/${cuisine.name}`);
   };
 
@@ -414,6 +416,7 @@ function Navbar() {
             <span className="categories-submenu hidden-mobile">Categories</span>
           }
           popupClassName="categories-popup"
+          popupOffset={[-45, 3]}
         >
           {categories.map((category) => (
             <Menu.Item
@@ -421,6 +424,7 @@ function Navbar() {
               onClick={() => handleMenuClickCategory(category)}
               onMouseEnter={() => setIsPopupOpen(true)}
               onMouseLeave={() => setIsPopupOpen(false)}
+              className="categorie-name-submenu"
             >
               {category.name}
             </Menu.Item>
@@ -432,6 +436,7 @@ function Navbar() {
             <span className="categories-submenu hidden-mobile">Cuisines</span>
           }
           popupClassName="cuisines-popup"
+          popupOffset={[-40, 3]}
         >
           {cuisines.map((cuisine) => (
             <Menu.Item
@@ -439,6 +444,7 @@ function Navbar() {
               onClick={() => handleMenuClickCuisine(cuisine)}
               onMouseEnter={() => setIsPopupOpen(true)}
               onMouseLeave={() => setIsPopupOpen(false)}
+              className="categorie-name-submenu"
             >
               {cuisine.name}
             </Menu.Item>
@@ -544,7 +550,8 @@ function Navbar() {
           <SubMenu
             key="categories"
             title={<span className="categories-drawer">Categories</span>}
-            popupClassName="categories-popup"
+            popupClassName="categories-popup-drawer"
+            popupOffset={[-270, 45]}
           >
             {categories.map((category) => (
               <Menu.Item
@@ -552,6 +559,7 @@ function Navbar() {
                 onClick={() => handleMenuClickCategory(category)}
                 onMouseEnter={() => setIsPopupOpen(true)}
                 onMouseLeave={() => setIsPopupOpen(false)}
+                className="categorie-name-submenu"
               >
                 {category.name}
               </Menu.Item>
@@ -560,7 +568,8 @@ function Navbar() {
           <SubMenu
             key="cuisines"
             title={<span className="categories-drawer">Cuisines</span>}
-            popupClassName="cuisines-popup"
+            popupClassName="categories-popup-drawer"
+            popupOffset={[-270, 45]}
           >
             {cuisines.map((cuisine) => (
               <Menu.Item
@@ -568,6 +577,7 @@ function Navbar() {
                 onClick={() => handleMenuClickCuisine(cuisine)}
                 onMouseEnter={() => setIsPopupOpen(true)}
                 onMouseLeave={() => setIsPopupOpen(false)}
+                className="categorie-name-submenu"
               >
                 {cuisine.name}
               </Menu.Item>
