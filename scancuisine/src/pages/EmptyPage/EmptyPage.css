@@ -1,0 +1,21 @@
+.empty-page-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Înălțimea completă a viewport-ului */
+  width: 100vw; /* Lățimea completă a viewport-ului */
+  background-color: #f0cff8; /* Alegeți culoarea de fundal dorită */
+}
+
+.empty-gif {
+  height: 70vh;
+  padding: 40px;
+  border-radius: 60px;
+  width: 33vw;
+  box-shadow: 0 0 15px 10px rgba(127, 20, 169, 0.1);
+}
+
+@media screen and (max-width: 480px) {
+  .empty-gif {
+    width: 70vw;
+  }
+}

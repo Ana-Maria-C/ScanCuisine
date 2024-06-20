@@ -184,7 +184,6 @@ function MyProfile() {
         const uniqueIngredients = response.data.extendedIngredients.map(
           (ingredient: Ingredient) => ingredient.name
         );
-        console.log("uniqueIngredients:", uniqueIngredients);
         const newRecommendedRecipe = {
           id: "",
           authorEmail: userEmail,
@@ -215,7 +214,7 @@ function MyProfile() {
           "http://localhost:8090/api/recommended-recipe",
           newRecommendedRecipe
         );
-        console.log("Response from adding recommended recipe:", postRecipe);
+        //console.log("Response from adding recommended recipe:", postRecipe);
       }
     } catch (error) {
       console.error("Error extracting the recommended recipes:", error);
@@ -328,7 +327,7 @@ function MyProfile() {
   };
 
   const handleAddRecipeClick = async () => {
-    console.log("se deschide modalul");
+    //console.log("se deschide modalul");
     const userEmail = await getUserEmail();
     setEmail(userEmail);
     setIsAddRecipeModalOpen(true);

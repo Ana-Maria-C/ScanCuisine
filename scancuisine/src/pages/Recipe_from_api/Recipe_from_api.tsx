@@ -60,7 +60,7 @@ function Recipe_from_api() {
       <div className="home-container">
         <div className="recipes">
           <div className="recipes-container">
-            {recipes.length > 0 &&
+            {recipes.length > 0 ? (
               recipes.map((recipe) => (
                 <CustomCard
                   key={recipe.id}
@@ -68,7 +68,19 @@ function Recipe_from_api() {
                   imageUrl={recipe.imageUrl}
                   title={recipe.name}
                 />
-              ))}
+              ))
+            ) : (
+              <div className="no-recipes">
+                <img
+                  src="https://firebasestorage.googleapis.com/v0/b/scan-cuisine-f4b13.appspot.com/o/gif%2Fsearch_more_ingredients_123456789.gif?alt=media&token=f4bd8e4d-0dbc-44fe-b46d-cedd70c05289"
+                  alt="No recipes available"
+                  className="no-recipe-gif"
+                />
+                <span className="no-recipe-text">
+                  No recipe found. Please add more ingredients!
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>

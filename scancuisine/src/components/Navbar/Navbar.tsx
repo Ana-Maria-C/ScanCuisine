@@ -305,7 +305,7 @@ function Navbar() {
         },
       };
       const response = await axios.request(options_2);
-      console.log("recipe based on ingredients", response.data);
+      //console.log("recipe based on ingredients", response.data);
 
       // get the recommended recipes based on the ids
 
@@ -354,16 +354,17 @@ function Navbar() {
           likes: 0,
           datePosted: new Date(),
         };
-        console.log("new recipe", newRecipe);
+        //console.log("new recipe", newRecipe);
         // post the recipe to the database
         const postRecipe = await axios.post(
           "http://localhost:8090/api/recipe-based-on-ingredients",
           newRecipe
         );
-        console.log(
+        /*console.log(
           "Response from adding recipe based on ingredients:",
           postRecipe
         );
+        */
       }
       setShowViewRecipeButton(true);
       // final
