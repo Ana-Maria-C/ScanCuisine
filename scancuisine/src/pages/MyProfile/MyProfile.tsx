@@ -181,13 +181,15 @@ function MyProfile() {
         if (preparationMethodforRecommendedRecipe === null) {
           preparationMethodforRecommendedRecipe = response.data.summary;
         }
+        const uniqueIngredients = response.data.extendedIngredients.map(
+          (ingredient: Ingredient) => ingredient.name
+        );
+        console.log("uniqueIngredients:", uniqueIngredients);
         const newRecommendedRecipe = {
           id: "",
           authorEmail: userEmail,
           name: response.data.title,
-          ingredients: response.data.extendedIngredients.map(
-            (ingredient: Ingredient) => ingredient.name
-          ),
+          ingredients: Array.from(new Set(uniqueIngredients)),
           preparationMethod: preparationMethodforRecommendedRecipe,
           imageUrl: response.data.image,
           category: response.data.dishTypes[0],

@@ -73,13 +73,7 @@ function Navbar() {
 
   const [modalContent, setModalContent] = useState<React.ReactNode>(null);
   const [title, setTitle] = useState<string>("Scan your fridge...");
-  const [ingredients, setIngredients] = useState<string[]>([
-    "milk",
-    "sugar",
-    "eggs",
-    "jam",
-    "flour",
-  ]);
+  const [ingredients, setIngredients] = useState<string[]>([]);
 
   const XRapidAPIKey = "75af58f578msh272dfd8ac1822c4p150537jsn4d64d2cb298b";
   const [showViewRecipeButton, setShowViewRecipeButton] = useState(false);
@@ -105,7 +99,7 @@ function Navbar() {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      console.log("token", token);
+      //console.log("token", token);
       setIsLoggedIn(true);
     }
 
@@ -236,7 +230,7 @@ function Navbar() {
 
   const uploadToStorage = async (blob: Blob) => {
     const userEmail = await getEmail();
-    console.log("email", userEmail);
+    //console.log("email", userEmail);
     const formData = new FormData();
 
     // generate a unique image name
@@ -262,9 +256,9 @@ function Navbar() {
 
       // După ce încărcarea a fost finalizată cu succes, obțineți URL-ul de descărcare
       const imageUrlDownload = await getDownloadURL(imageRef);
-      console.log("image url", imageUrlDownload);
+      //console.log("image url", imageUrlDownload);
 
-      // sterg retetele pe baza ngredientelor anterioare
+      // sterg retetele pe baza ingredientelor anterioare
       const response_delete = await axios.delete(
         `http://localhost:8090/api/recipe-based-on-ingredients/${userEmail}`
       );
@@ -286,24 +280,20 @@ function Navbar() {
         },
       };
 
-      try {
-        const response = await axios.request(options_1); //--decomenteaza
-        console.log("ingrediente recunoscute: ", response.data.response); //--decomenteaza
-        //extract ingredients from response
-        const ingredients = response.data.response; //--decomenteaza
-        setIngredients(ingredients); //--decomenteaza
-      } catch (error) {
-        console.error(error);
-      }
+      const get_ingredients_response = await axios.request(options_1); //--decomenteaza
+
+      //extract ingredients from response
+      const ingredients_response = get_ingredients_response.data.response; //--decomenteaza
+      setIngredients(ingredients_response); //--decomenteaza
 
       // get recipes based on ingredients
-      const ingredients_to_string = ingredients.join(",");
+      //console.log("ingredients", ingredients_response);
 
       const options_2 = {
         method: "GET",
         url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/findByIngredients",
         params: {
-          ingredients: ingredients_to_string,
+          ingredients: ingredients_response,
           number: "8",
           ignorePantry: "true",
           ranking: "1",
@@ -325,7 +315,7 @@ function Navbar() {
       for (let element of response.data) {
         ids.push(element.id);
       }
-      console.log("ids", ids);
+      //console.log("ids", ids);
 
       // extrag informatiile pentru fiecare reteta pe baza id-ului
       for (let id of ids) {
@@ -347,13 +337,14 @@ function Navbar() {
         if (preparationMethodforRecommendedRecipe === null) {
           preparationMethodforRecommendedRecipe = response.data.summary;
         }
+        const unique_ingredients = response.data.extendedIngredients.map(
+          (ingredient: Ingredient) => ingredient.name
+        );
         const newRecipe = {
           id: "",
           authorEmail: userEmail,
           name: response.data.title,
-          ingredients: response.data.extendedIngredients.map(
-            (ingredient: Ingredient) => ingredient.name
-          ),
+          ingredients: Array.from(new Set(unique_ingredients)),
           preparationMethod: preparationMethodforRecommendedRecipe,
           imageUrl: response.data.image,
           category: response.data.dishTypes[0],
