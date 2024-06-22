@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import { message } from "antd";
 
 export default function Login() {
   const images = [
@@ -38,8 +39,13 @@ export default function Login() {
       );
 
       console.log("Login successful, token: ", response.data);
-      localStorage.setItem("token", response.data["token"]);
-      setloginSuccess(true);
+      console.log("response from login", response.data.errorMessage);
+      if (response.data.errorMessage === null) {
+        localStorage.setItem("token", response.data["token"]);
+        setloginSuccess(true);
+      } else {
+        message.error(response.data.errorMessage);
+      }
     } catch (error) {
       console.error("Login failed:", (error as Error).message);
       // Handle login failure, such as displaying an error message to the user

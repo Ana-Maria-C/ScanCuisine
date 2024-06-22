@@ -26,6 +26,12 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest registerRequest) throws ExecutionException, InterruptedException {
         // Create a new instance of your application's User entity
         User user = new User();
+        if(registerRequest.getEmail().equals("") || registerRequest.getFirstName().equals("") || registerRequest.getLastName().equals("") || registerRequest.getPassword().equals("")){
+            return AuthenticationResponse.builder().errorMessage("All fields must be filled!").build();
+        }
+        if(registerRequest.getEmail().contains(" ") || !(registerRequest.getEmail().contains("@") && registerRequest.getEmail().contains("."))){
+            return AuthenticationResponse.builder().errorMessage("Incorrect email!").build();
+        }
         user.setEmail(registerRequest.getEmail());
         user.setFirstName(registerRequest.getFirstName());
         user.setLastName(registerRequest.getLastName());

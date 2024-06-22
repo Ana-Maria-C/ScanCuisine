@@ -98,9 +98,7 @@ function AddRecipeModal({
     fetchCuisines();
     const { name, value } = e.target;
     if (name === "ingredients") {
-      const ingredientsArray = value
-        .split(",")
-        .map((ingredient) => ingredient.trim());
+      const ingredientsArray = value.split(",").map((ingredient) => ingredient);
       setRecipeData((prevData) => ({
         ...prevData,
         [name]: ingredientsArray,
@@ -178,19 +176,6 @@ function AddRecipeModal({
     }
   };
 
-  /*const fetchUserEmail = async () => {
-    try {
-      const myToken = localStorage.getItem("token");
-      console.log("Token:", myToken);
-      const response = await axios.get(
-        `http://localhost:8090/api/users/token/${myToken}`
-      );
-      return response.data.email;
-    } catch (error) {
-      console.error("Error fetching user email:", error);
-    }
-  };
-*/
   const fetchUserEmail = async () => {
     try {
       const myToken = localStorage.getItem("token");

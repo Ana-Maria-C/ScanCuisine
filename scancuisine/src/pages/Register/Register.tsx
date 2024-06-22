@@ -4,6 +4,7 @@ import "./Register.css";
 import { useState } from "react";
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import { message } from "antd";
 
 export default function Register() {
   const images = [
@@ -39,7 +40,11 @@ export default function Register() {
         userData
       );
       console.log(response.data); // Handle successful registration response
-      setRegistrationSuccess(true);
+      if (response.data.errorMessage === null) {
+        setRegistrationSuccess(true);
+      } else {
+        message.error(response.data.errorMessage);
+      }
     } catch (error) {
       console.error("Registration failed:", (error as Error).message); // Handle registration error
     }
