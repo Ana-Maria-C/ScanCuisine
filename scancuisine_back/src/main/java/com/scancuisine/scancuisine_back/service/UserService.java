@@ -214,4 +214,19 @@ public class UserService {
             return updateUser(email, user);
         }
     }
+
+    public List<String> getRecipeOfUser(String email) {
+        User user = getUserbyEmail(email);
+        if (user == null) {
+            return new ArrayList<>();
+        }
+        List<String> recipeOfUser = user.getMyRecipes();
+        if (recipeOfUser.isEmpty())
+        {
+            return new ArrayList<>();
+        }
+        return recipeOfUser.stream()
+                .filter(recipe -> recipe != null && !recipe.isEmpty())
+                .toList();
+    }
 }

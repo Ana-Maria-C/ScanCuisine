@@ -82,4 +82,11 @@ public class UserController {
         return ResponseEntity.ok(result);
     }
 
+    @GetMapping("/recipes/{email}")
+    public List<String> getRecipesOfUser(@PathVariable String email)
+    {
+        List<String> recipes = userService.getRecipeOfUser(email);
+        return recipes;
+    }
+
 }

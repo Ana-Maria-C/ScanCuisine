@@ -115,106 +115,68 @@ function MyProfile() {
     UserFavoriteRecipes: Recipe[],
     userEmail: String
   ) => {
-    let recommendedRecipeUrls = [];
     let firstFiveRecipes = UserFavoriteRecipes.slice(0, 5);
-    let uniqueIds = new Set(favoriteRecipeIds);
     try {
+      // get simiar recipes
       for (let recipe of firstFiveRecipes) {
-        // extract id from extern api
-        const options = {
+        const tags_for_recipe =
+          recipe.category.toLowerCase() + "," + recipe.cuisine.toLowerCase();
+        const options_similarRecipes = {
           method: "GET",
-          url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/complexSearch",
-          params: { query: recipe.name },
-          headers: {
-            "X-RapidAPI-Key": XRapidAPIKey,
-            "X-RapidAPI-Host":
-              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-          },
-        };
-        const response = await axios.request(options);
-        if (response.data.results) {
-          uniqueIds.add(response.data.results[0]["id"]);
-        }
-      }
-      const listFavoriteRecipeIds = Array.from(uniqueIds);
-
-      // get the recommended recipes based on the ids
-
-      for (let id of listFavoriteRecipeIds) {
-        const options = {
-          method: "GET",
-          url: `https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/${id}/similar`,
-          headers: {
-            "X-RapidAPI-Key": XRapidAPIKey,
-            "X-RapidAPI-Host":
-              "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
-          },
-        };
-        const response = await axios.request(options);
-        if (response.data) {
-          const firstTwoRecommendedRecipe = response.data.slice(0, 2);
-          for (let recipe of firstTwoRecommendedRecipe) {
-            recommendedRecipeUrls.push(recipe.sourceUrl);
-          }
-        }
-      }
-
-      // extract the recommended recipes from the urls
-
-      for (let url of recommendedRecipeUrls) {
-        const options = {
-          method: "GET",
-          url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/extract",
+          url: "https://spoonacular-recipe-food-nutrition-v1.p.rapidapi.com/recipes/random",
           params: {
-            url: url,
+            tags: tags_for_recipe,
+            number: "2",
           },
           headers: {
-            "X-RapidAPI-Key": XRapidAPIKey,
-            "X-RapidAPI-Host":
+            "x-rapidapi-key": XRapidAPIKey,
+            "x-rapidapi-host":
               "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com",
           },
         };
+        const response_similar_recipe = await axios.request(
+          options_similarRecipes
+        );
 
-        const response = await axios.request(options);
-        // store the recommended recipes in my database
-        let preparationMethodforRecommendedRecipe = response.data.instructions;
-        if (preparationMethodforRecommendedRecipe === null) {
-          preparationMethodforRecommendedRecipe = response.data.summary;
+        for (let currentRecipe of response_similar_recipe.data.recipes) {
+          console.log(currentRecipe);
+          // extract the recommended recipe and store them to database
+
+          // extract the preparationMethod
+          let preparationMethodforRecommendedRecipe =
+            currentRecipe.instructions;
+          if (preparationMethodforRecommendedRecipe === null) {
+            preparationMethodforRecommendedRecipe = currentRecipe.summary;
+          }
+          // extract the ingredients
+
+          const uniqueIngredients = currentRecipe.extendedIngredients.map(
+            (ingredient: Ingredient) => ingredient.name
+          );
+
+          // create the new recommended recipe
+          const newRecommendedRecipe = {
+            id: "",
+            authorEmail: userEmail,
+            name: currentRecipe.title,
+            ingredients: Array.from(new Set(uniqueIngredients)),
+            preparationMethod: preparationMethodforRecommendedRecipe,
+            imageUrl: currentRecipe.image,
+            category: currentRecipe.dishTypes[0],
+            cuisine: currentRecipe.cuisines[0],
+            videoUrl: "",
+            commentId: [],
+            likes: 0,
+            datePosted: new Date(),
+          };
+
+          // post the new recommended recipe
+          const postRecipe = await axios.post(
+            "http://localhost:8090/api/recommended-recipe",
+            newRecommendedRecipe
+          );
+          //console.log("Response from adding recommended recipe:", postRecipe);
         }
-        const uniqueIngredients = response.data.extendedIngredients.map(
-          (ingredient: Ingredient) => ingredient.name
-        );
-        const newRecommendedRecipe = {
-          id: "",
-          authorEmail: userEmail,
-          name: response.data.title,
-          ingredients: Array.from(new Set(uniqueIngredients)),
-          preparationMethod: preparationMethodforRecommendedRecipe,
-          imageUrl: response.data.image,
-          category: response.data.dishTypes[0],
-          cuisine: response.data.cuisines[0],
-          videoUrl: "",
-          commentId: [],
-          likes: 0,
-          datePosted: new Date(),
-        };
-        /*id: string;
-            authorEmail: string;
-            name: string;
-            ingredients: string[];
-            preparationMethod: string;
-            imageUrl: string;
-            category: string;
-            cuisine: string;
-            videoUrl: string;
-            commentId: string[];
-            likes: number;
-            */
-        const postRecipe = await axios.post(
-          "http://localhost:8090/api/recommended-recipe",
-          newRecommendedRecipe
-        );
-        //console.log("Response from adding recommended recipe:", postRecipe);
       }
     } catch (error) {
       console.error("Error extracting the recommended recipes:", error);
